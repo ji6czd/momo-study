@@ -1,0 +1,99 @@
+---
+import { withBase } from "../lib/url";
+import { getNextPage } from "../data/pages";
+
+interface Props {
+	title?: string;
+	/** data/pages.ts 上のスラッグ。指定すると本文末尾に「次のページへ」リンクを出す。 */
+	pageSlug?: string;
+}
+
+const { title, pageSlug } = Astro.props;
+const siteName = "モモさんと点字を学ぼう！";
+const pageTitle = title ? `${title} | ${siteName}` : siteName;
+const nextPage = pageSlug ? getNextPage(pageSlug) : null;
+
+// @font-face の url() はCSSカスタムプロパティを解決できない(要素に紐付かないため)ので、
+// base込みのURLをビルド時に文字列として直接埋め込む。
+const brailleFontUrl = withBase("fonts/dejavu/DejaVuSansMono.ttf");
+const brailleFontFaceCss = `
+	@font-face {
+		font-family: "DejaVu Sans Mono";
+		src: url("${brailleFontUrl}") format("truetype");
+		font-display: swap;
+	}
+`;
+---
+
+<html lang="ja">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href={withBase("favicon.svg")} />
+		<link rel="icon" href={withBase("favicon.ico")} />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{pageTitle}</title>
+		<style is:global set:html={brailleFontFaceCss} />
+	</head>
+	<body>
+		<a class="skip-link" href="#main">本文へスキップ</a>
+		<header>
+			<a href={withBase("")}>{siteName}</a>
+		</header>
+		<main id="main">
+			<slot />
+			{
+				nextPage && (
+					<nav class="next-page" aria-label="次のページ">
+						<a href={withBase(nextPage.slug)}>つぎ：{nextPage.title} →</a>
+					</nav>
+				)
+			}
+		</main>
+	</body>
+</html>
+
+<style>
+	.skip-link {
+		position: absolute;
+		left: -9999px;
+		top: 0;
+	}
+	.skip-link:focus {
+		left: 0;
+		z-index: 100;
+		padding: 0.5em 1em;
+		background: #fff;
+	}
+
+	.next-page {
+		margin-top: 2.5rem;
+		padding-top: 1rem;
+		border-top: 1px solid #ccc;
+		text-align: right;
+	}
+
+	.next-page a {
+		font-size: 1.1rem;
+		font-weight: bold;
+	}
+</style>
+
+<style is:global>
+	/*
+	 * 点字表示に使うフォント。DejaVu Sans Mono(自己ホスト、public/fonts/dejavu/)を
+	 * 第一候補にし、無ければ環境依存のmonospaceにフォールバックする。
+	 * is:globalなのは、各ページ(スロットされた側)の要素にも効かせるため
+	 * (Astroの通常のスコープ付きスタイルはスロット先の要素には効かない)。
+	 */
+	:root {
+		--font-braille: "DejaVu Sans Mono", monospace;
+	}
+
+	.braille,
+	.braille-example,
+	#braille-input,
+	#result-area {
+		font-family: var(--font-braille);
+	}
+</style>

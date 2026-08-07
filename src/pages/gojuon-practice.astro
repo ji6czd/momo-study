@@ -1,0 +1,242 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { GOJUON_COLUMNS, GOJUON_ROWS, DAKUON_GROUPS } from "../data/gojuon";
+---
+
+<Layout title="五十音表を見ながら書いてみよう" pageSlug="gojuon-practice">
+	<h1>五十音表を見ながら書いてみよう</h1>
+	<p>
+		表を見ながら、<kbd>F</kbd><kbd>D</kbd><kbd>S</kbd><kbd>J</kbd><kbd>K</kbd><kbd
+			>L</kbd
+		>の6つのキーで点字を打ってみよう。
+	</p>
+
+	<div class="layout">
+		<div class="table-panel">
+			<table>
+				<caption>五十音表</caption>
+				<thead>
+					<tr>
+						<th scope="col"></th>
+						{GOJUON_COLUMNS.map((col) => <th scope="col">{col}</th>)}
+					</tr>
+				</thead>
+				<tbody>
+					{
+						GOJUON_ROWS.map((row) => (
+							<tr>
+								<th scope="row">{row.label}</th>
+								{row.cells.map((cell) =>
+									cell ? (
+										<td>
+											<span class="kana">{cell.kana}</span>
+											<span class="braille">{cell.braille}</span>
+										</td>
+									) : (
+										<td aria-hidden="true"></td>
+									),
+								)}
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+
+			<table>
+				<caption>濁音・半濁音</caption>
+				<thead>
+					<tr>
+						<th scope="col"></th>
+						{GOJUON_COLUMNS.map((col) => <th scope="col">{col}</th>)}
+					</tr>
+				</thead>
+				<tbody>
+					{
+						DAKUON_GROUPS.map((group) => (
+							<tr>
+								<th scope="row">{group.label}</th>
+								{group.cells.map((cell) => (
+									<td>
+										<span class="kana">{cell.kana}</span>
+										<span class="braille">{cell.braille}</span>
+									</td>
+								))}
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+
+		<div class="practice-panel">
+			<h2>単語をあててみよう</h2>
+			<p class="word-prompt">「<span id="word-prompt"></span>」</p>
+
+			<label for="braille-input">打った点字</label>
+			<textarea id="braille-input" rows="3" autocomplete="off" spellcheck="false"></textarea>
+
+			<p class="buttons">
+				<button type="button" id="check-button">こたえあわせ</button>
+				<button type="button" id="next-button">つぎのもんだい</button>
+			</p>
+
+			<p id="feedback" aria-live="polite"></p>
+			<p id="score"></p>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	kbd {
+		display: inline-block;
+		min-width: 1.5em;
+		padding: 0.1em 0.4em;
+		border: 1px solid #888;
+		border-radius: 4px;
+		background: #f5f5f5;
+		font-family: inherit;
+		text-align: center;
+	}
+
+	.layout {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 2rem;
+		align-items: flex-start;
+		margin-top: 1.5rem;
+	}
+
+	.table-panel {
+		position: sticky;
+		top: 1rem;
+	}
+
+	table {
+		border-collapse: collapse;
+		margin-bottom: 1.5rem;
+	}
+
+	caption {
+		font-weight: bold;
+		text-align: left;
+		margin-bottom: 0.3rem;
+	}
+
+	th,
+	td {
+		border: 1px solid #ccc;
+		padding: 0.3rem 0.5rem;
+		text-align: center;
+	}
+
+	td {
+		display: table-cell;
+	}
+
+	.kana {
+		display: block;
+		font-size: 1rem;
+	}
+
+	.braille {
+		display: block;
+		font-size: 1.3rem;
+	}
+
+	.practice-panel {
+		flex: 1 1 20rem;
+	}
+
+	#braille-input {
+		width: 100%;
+		max-width: 32rem;
+		font-size: 2rem;
+		line-height: 1.8;
+		resize: vertical;
+	}
+
+	.word-prompt {
+		font-size: 1.8rem;
+		font-weight: bold;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.buttons button {
+		font-size: 1rem;
+		padding: 0.4rem 0.8rem;
+	}
+
+	#feedback.correct {
+		color: #0a7a2f;
+		font-weight: bold;
+	}
+
+	#feedback.incorrect {
+		color: #b3261e;
+		font-weight: bold;
+	}
+
+	#score {
+		color: #555;
+	}
+</style>
+
+<script>
+	import { attachBrailleInput } from "../lib/brailleInput";
+	import { BASIC_WORDS as WORDS, type Word } from "../data/words";
+
+	const input = document.getElementById("braille-input") as HTMLTextAreaElement;
+	const wordPrompt = document.getElementById("word-prompt") as HTMLElement;
+	const checkButton = document.getElementById("check-button") as HTMLButtonElement;
+	const nextButton = document.getElementById("next-button") as HTMLButtonElement;
+	const feedback = document.getElementById("feedback") as HTMLElement;
+	const score = document.getElementById("score") as HTMLElement;
+
+	attachBrailleInput({ textarea: input });
+
+	let currentWord: Word = WORDS[0];
+	let correctCount = 0;
+	let totalCount = 0;
+
+	function pickWord(exclude?: Word): Word {
+		const candidates = WORDS.length > 1 ? WORDS.filter((w) => w !== exclude) : WORDS;
+		return candidates[Math.floor(Math.random() * candidates.length)];
+	}
+
+	function showWord(word: Word) {
+		currentWord = word;
+		wordPrompt.textContent = word.kana;
+		feedback.textContent = "";
+		feedback.className = "";
+		input.value = "";
+		input.focus();
+	}
+
+	function updateScore() {
+		score.textContent = `せいかい: ${correctCount} / ぜんぶ: ${totalCount}もん`;
+	}
+
+	checkButton.addEventListener("click", () => {
+		totalCount++;
+		if (input.value.trim() === currentWord.braille) {
+			correctCount++;
+			feedback.textContent = "せいかい！";
+			feedback.className = "correct";
+		} else {
+			feedback.textContent = `ざんねん。せいかいは「${currentWord.braille}」だったよ`;
+			feedback.className = "incorrect";
+		}
+		updateScore();
+	});
+
+	nextButton.addEventListener("click", () => {
+		showWord(pickWord(currentWord));
+	});
+
+	showWord(pickWord());
+	updateScore();
+</script>

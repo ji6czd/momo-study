@@ -1,43 +1,35 @@
-# Astro Starter Kit: Minimal
+# モモさんと点字を学ぼう！
 
-```sh
-pnpm create astro@latest -- --template minimal
-```
+点字について、いっしょに学べるポータルサイト（作成中）。
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## セットアップ
 
-## 🚀 Project Structure
+点字の逆変換（点字→かな）には [momors-wasm](https://github.com/ji6czd/momo) を使っています。
+translatorとモデルのバージョンがずれて壊れることを避けるため、この2つは1つのSDK配布物にまとめられていて、
+このリポジトリではgit管理せず、配布物を`vendor/`に展開して使う方式にしています。
 
-Inside of your Astro project, you'll see the following folders and files:
+1. [momoの配布サイト](https://github.com/ji6czd/momo/releases)
+   から `momo-sdk-wasm-x.y.z.zip` をダウンロードする
+2. zip、このプロジェクトの `vendor/` に展開する
+3. 依存関係をインストールする
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+   ```sh
+   pnpm install
+   ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+4. 開発サーバーを起動する
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+   ```sh
+   pnpm dev
+   ```
 
-Any static assets, like images, can be placed in the `public/` directory.
+`vendor/`は`.gitignore`対象です。SDKを更新したいときは、新しいzipを同じ手順で展開し直すだけで反映されます。
 
-## 🧞 Commands
+## コマンド
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+| Command        | Action                                |
+| :------------- | :------------------------------------ |
+| `pnpm install` | 依存関係をインストール                |
+| `pnpm dev`     | `localhost:4321` で開発サーバーを起動 |
+| `pnpm build`   | `./dist/` に本番ビルドを出力          |
+| `pnpm preview` | ビルド結果をローカルでプレビュー      |

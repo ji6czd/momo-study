@@ -1,17 +1,25 @@
 ---
-
+import Layout from "../layouts/Layout.astro";
+import { withBase } from "../lib/url";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+	<h1>モモさんと点字を学ぼう！</h1>
+	<p>点字について、いっしょに学んでいこう。</p>
+	<ul>
+		<li><a href={withBase("what-is-braille")}>点字って何？</a></li>
+		<li><a href={withBase("write-freely")}>自由に書いてみよう</a></li>
+		<li><a href={withBase("history")}>点字はいつできたの？</a></li>
+		<li><a href={withBase("gojuon-practice")}>五十音表を見ながら書いてみよう</a></li>
+		<li><a href={withBase("yoon")}>拗音・特殊音も覚えよう</a></li>
+		<li><a href={withBase("history-japan")}>日本の点字はいつできたの？</a></li>
+		<li><a href={withBase("numbers")}>数字の書き方を覚えよう</a></li>
+		<li><a href={withBase("what-can-be-written")}>点字ではどんな文字が書けるの？</a></li>
+		<li><a href={withBase("writing-tools")}>点字はどうやって書くの？</a></li>
+		<li><a href={withBase("wakachigaki")}>分かち書きって何？</a></li>
+		<li><a href={withBase("sentences")}>文章を書いてみよう</a></li>
+		<li><a href={withBase("names")}>名前の書き方を知ろう</a></li>
+		<li><a href={withBase("message")}>メッセージを書いてみよう</a></li>
+		<li><a href={withBase("find-braille")}>点字を探してみよう</a></li>
+	</ul>
+</Layout>

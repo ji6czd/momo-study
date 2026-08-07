@@ -1,0 +1,209 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { WAKACHI_WORDS as WORDS } from "../data/words";
+---
+
+<Layout title="分かち書きって何？" pageSlug="wakachigaki">
+	<h1>分かち書きって何？</h1>
+	<p>
+		かなだけで書かれた文章は読みにくいよね。たとえば「わたしはねこがすきです」を、区切りなしでこう書いてみると：
+	</p>
+	<p class="example">わたしはねこがすきです</p>
+	<p>読みにくいよね。でも、ことばの区切りにスペースを入れるとどうかな。</p>
+	<p class="example">わたしは　ねこが　すきです</p>
+	<p>ぐっと読みやすくなったよね。</p>
+
+	<p>
+		点字も同じで、かなをずっと続けて書くと読みにくくなるんだ。だから点字も、ことばの区切りにスペース(点字1マスぶんの空白)を入れて書くよ。これを<strong
+			>分かち書き(わかちがき)</strong
+		>と呼ぶんだ。
+	</p>
+
+	<p>
+		でも、みんなが自由に区切ってしまうと、人によって書き方がバラバラになって、かえって読みにくくなっちゃう。だからちゃんとルールが決まっているんだ。全部覚えようとするとすごく難しいけど、基本はシンプルだよ。
+	</p>
+
+	<ul>
+		<li>単語と単語の間は区切る</li>
+		<li>「は」「の」のような助詞っぽいものは、前の単語にくっつけて書く(区切らない)</li>
+	</ul>
+
+	<table>
+		<caption>もとの文・かな・点字</caption>
+		<thead>
+			<tr>
+				<th scope="col">もとの文</th>
+				<th scope="col">かな</th>
+				<th scope="col">点字</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				WORDS.map((w) => (
+					<tr>
+						<th scope="row">{w.source}</th>
+						<td>{w.kana}</td>
+						<td class="braille">{w.braille}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+
+	<p>
+		「私は花」を見てみて。「は」は前の「わたし」にくっついていて、区切りは「わたしは」と「はな」の間に入っているよね。「犬のしっぽ」の「の」も同じだよ。
+	</p>
+
+	<h2>分かち書きに挑戦してみよう</h2>
+	<p>
+		区切りの場所には、点のキーを何も押さずに<kbd>Space</kbd>キーだけを押してね。それでスペースの1マスが打てるよ。
+	</p>
+	<p class="word-prompt">「<span id="word-prompt"></span>」</p>
+
+	<label for="braille-input">打った点字</label>
+	<textarea id="braille-input" rows="3" autocomplete="off" spellcheck="false"></textarea>
+
+	<p class="buttons">
+		<button type="button" id="check-button">こたえあわせ</button>
+		<button type="button" id="next-button">つぎのもんだい</button>
+	</p>
+
+	<p id="feedback" aria-live="polite"></p>
+	<p id="score"></p>
+</Layout>
+
+<style>
+	kbd {
+		display: inline-block;
+		min-width: 1.5em;
+		padding: 0.1em 0.4em;
+		border: 1px solid #888;
+		border-radius: 4px;
+		background: #f5f5f5;
+		font-family: inherit;
+		text-align: center;
+	}
+
+	.example {
+		font-size: 1.3rem;
+		padding: 0.5rem 0.8rem;
+		background: #f5f5f5;
+		border-radius: 4px;
+		display: inline-block;
+	}
+
+	table {
+		border-collapse: collapse;
+		margin: 1rem 0 1.5rem;
+	}
+
+	caption {
+		font-weight: bold;
+		text-align: left;
+		margin-bottom: 0.3rem;
+	}
+
+	th,
+	td {
+		border: 1px solid #ccc;
+		padding: 0.3rem 0.6rem;
+		text-align: center;
+	}
+
+	.braille {
+		font-size: 1.3rem;
+	}
+
+	.word-prompt {
+		font-size: 1.8rem;
+		font-weight: bold;
+	}
+
+	#braille-input {
+		width: 100%;
+		max-width: 32rem;
+		font-size: 2rem;
+		line-height: 1.8;
+		resize: vertical;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.buttons button {
+		font-size: 1rem;
+		padding: 0.4rem 0.8rem;
+	}
+
+	#feedback.correct {
+		color: #0a7a2f;
+		font-weight: bold;
+	}
+
+	#feedback.incorrect {
+		color: #b3261e;
+		font-weight: bold;
+	}
+
+	#score {
+		color: #555;
+	}
+</style>
+
+<script>
+	import { attachBrailleInput } from "../lib/brailleInput";
+	import { WAKACHI_WORDS as WORDS, type KanjiWord } from "../data/words";
+
+	const input = document.getElementById("braille-input") as HTMLTextAreaElement;
+	const wordPrompt = document.getElementById("word-prompt") as HTMLElement;
+	const checkButton = document.getElementById("check-button") as HTMLButtonElement;
+	const nextButton = document.getElementById("next-button") as HTMLButtonElement;
+	const feedback = document.getElementById("feedback") as HTMLElement;
+	const score = document.getElementById("score") as HTMLElement;
+
+	attachBrailleInput({ textarea: input });
+
+	let currentWord: KanjiWord = WORDS[0];
+	let correctCount = 0;
+	let totalCount = 0;
+
+	function pickWord(exclude?: KanjiWord): KanjiWord {
+		const candidates = WORDS.length > 1 ? WORDS.filter((w) => w !== exclude) : WORDS;
+		return candidates[Math.floor(Math.random() * candidates.length)];
+	}
+
+	function showWord(word: KanjiWord) {
+		currentWord = word;
+		wordPrompt.textContent = word.source;
+		feedback.textContent = "";
+		feedback.className = "";
+		input.value = "";
+		input.focus();
+	}
+
+	function updateScore() {
+		score.textContent = `せいかい: ${correctCount} / ぜんぶ: ${totalCount}もん`;
+	}
+
+	checkButton.addEventListener("click", () => {
+		totalCount++;
+		if (input.value.trim() === currentWord.braille) {
+			correctCount++;
+			feedback.textContent = "せいかい！";
+			feedback.className = "correct";
+		} else {
+			feedback.textContent = `ざんねん。せいかいは「${currentWord.braille}」だったよ`;
+			feedback.className = "incorrect";
+		}
+		updateScore();
+	});
+
+	nextButton.addEventListener("click", () => {
+		showWord(pickWord(currentWord));
+	});
+
+	showWord(pickWord());
+	updateScore();
+</script>

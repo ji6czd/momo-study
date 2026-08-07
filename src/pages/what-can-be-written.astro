@@ -1,0 +1,218 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { CHARACTER_WORDS as WORDS } from "../data/words";
+---
+
+<Layout title="点字ではどんな文字が書けるの？" pageSlug="what-can-be-written">
+	<h1>点字にはどんな文字が書けるの？</h1>
+	<p>ここまで見てきたように、点字には「かな」と「数字」があるよ。</p>
+	<p>
+		もともとはアルファベットも書けるように作られていたんだ。考えた人、ルイ・ブライユさんは、実はオルガンやピアノがとても上手な人で、点字で楽譜も書けるように工夫していたんだよ。
+	</p>
+	<p>
+		でも、点字には「漢字」が無いんだ。漢字は数がとても多いし、点字の1マスは64通りしかないから、漢字ぜんぶに違う形を割りあてるのは難しいし、それを読み分けるのはもっと難しいよね。だから日本語の点字は、かなだけで書くことに決まったんだ。
+	</p>
+	<p>
+		そして、書くときは「話しているときの音」に近い書き方をするよ。たとえば「こんにちは」の「は」は、実際には「わ」と発音するよね。点字でもそのとおり「わ」の音で書くんだ。
+	</p>
+
+	<table>
+		<caption>もとの文字・かな・点字</caption>
+		<thead>
+			<tr>
+				<th scope="col">もとの文字</th>
+				<th scope="col">かな</th>
+				<th scope="col">点字</th>
+			</tr>
+		</thead>
+		<tbody>
+			{
+				WORDS.map((w) => (
+					<tr>
+						<th scope="row">{w.source}</th>
+						<td>{w.kana}</td>
+						<td class="braille">{w.braille}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+
+	<p>
+		「こんにちは」の点字をよく見てみて。最後が「は」の点(⠥)ではなく、「わ」の点(⠄)になっているのがわかるかな？これが「話す音に近い書き方」の例だよ。
+	</p>
+
+	<h2>1つの言葉が、いくつもの意味になることも</h2>
+	<p>
+		点字はかなで書くから、同じ読み方の言葉は同じ点字になるよ。でも日本語には、読み方は同じなのに、漢字も意味もちがう言葉がたくさんあるんだ。
+	</p>
+
+	<table>
+		<caption>読み方が同じで、意味がちがう言葉</caption>
+		<thead>
+			<tr>
+				<th scope="col">かな</th>
+				<th scope="col">点字</th>
+				<th scope="col">漢字と意味</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">あめ</th>
+				<td class="braille">⠁⠿</td>
+				<td class="meaning">雨 / 飴</td>
+			</tr>
+			<tr>
+				<th scope="row">はな</th>
+				<td class="braille">⠥⠅</td>
+				<td class="meaning">花 / 鼻</td>
+			</tr>
+			<tr>
+				<th scope="row">しろ</th>
+				<td class="braille">⠳⠚</td>
+				<td class="meaning">白 / 城</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		「あめ」という点字だけを見せられても、空から降る雨のことなのか、なめるあめ玉のことなのか、これだけでは分からないよね。単語ひとつだけでは意味が決まらないことがある、これは点字の弱点のひとつともいえるんだ。
+	</p>
+
+	<p>こういう「読み方が同じで意味がちがう言葉」、ほかにも探してみてね。</p>
+
+	<h2>もとの文字から点字を書いてみよう</h2>
+	<p class="word-prompt">「<span id="word-prompt"></span>」</p>
+
+	<label for="braille-input">打った点字</label>
+	<textarea id="braille-input" rows="3" autocomplete="off" spellcheck="false"></textarea>
+
+	<p class="buttons">
+		<button type="button" id="check-button">こたえあわせ</button>
+		<button type="button" id="next-button">つぎのもんだい</button>
+	</p>
+
+	<p id="feedback" aria-live="polite"></p>
+	<p id="score"></p>
+</Layout>
+
+<style>
+	table {
+		border-collapse: collapse;
+		margin: 1rem 0 1.5rem;
+	}
+
+	caption {
+		font-weight: bold;
+		text-align: left;
+		margin-bottom: 0.3rem;
+	}
+
+	th,
+	td {
+		border: 1px solid #ccc;
+		padding: 0.3rem 0.6rem;
+		text-align: center;
+	}
+
+	.braille {
+		font-size: 1.3rem;
+	}
+
+	.meaning {
+		text-align: left;
+	}
+
+	.word-prompt {
+		font-size: 1.8rem;
+		font-weight: bold;
+	}
+
+	#braille-input {
+		width: 100%;
+		max-width: 32rem;
+		font-size: 2rem;
+		line-height: 1.8;
+		resize: vertical;
+	}
+
+	.buttons {
+		display: flex;
+		gap: 0.5rem;
+	}
+
+	.buttons button {
+		font-size: 1rem;
+		padding: 0.4rem 0.8rem;
+	}
+
+	#feedback.correct {
+		color: #0a7a2f;
+		font-weight: bold;
+	}
+
+	#feedback.incorrect {
+		color: #b3261e;
+		font-weight: bold;
+	}
+
+	#score {
+		color: #555;
+	}
+</style>
+
+<script>
+	import { attachBrailleInput } from "../lib/brailleInput";
+	import { CHARACTER_WORDS as WORDS, type KanjiWord } from "../data/words";
+
+	const input = document.getElementById("braille-input") as HTMLTextAreaElement;
+	const wordPrompt = document.getElementById("word-prompt") as HTMLElement;
+	const checkButton = document.getElementById("check-button") as HTMLButtonElement;
+	const nextButton = document.getElementById("next-button") as HTMLButtonElement;
+	const feedback = document.getElementById("feedback") as HTMLElement;
+	const score = document.getElementById("score") as HTMLElement;
+
+	attachBrailleInput({ textarea: input });
+
+	let currentWord: KanjiWord = WORDS[0];
+	let correctCount = 0;
+	let totalCount = 0;
+
+	function pickWord(exclude?: KanjiWord): KanjiWord {
+		const candidates = WORDS.length > 1 ? WORDS.filter((w) => w !== exclude) : WORDS;
+		return candidates[Math.floor(Math.random() * candidates.length)];
+	}
+
+	function showWord(word: KanjiWord) {
+		currentWord = word;
+		wordPrompt.textContent = word.source;
+		feedback.textContent = "";
+		feedback.className = "";
+		input.value = "";
+		input.focus();
+	}
+
+	function updateScore() {
+		score.textContent = `せいかい: ${correctCount} / ぜんぶ: ${totalCount}もん`;
+	}
+
+	checkButton.addEventListener("click", () => {
+		totalCount++;
+		if (input.value.trim() === currentWord.braille) {
+			correctCount++;
+			feedback.textContent = "せいかい！";
+			feedback.className = "correct";
+		} else {
+			feedback.textContent = `ざんねん。せいかいは「${currentWord.braille}」だったよ`;
+			feedback.className = "incorrect";
+		}
+		updateScore();
+	});
+
+	nextButton.addEventListener("click", () => {
+		showWord(pickWord(currentWord));
+	});
+
+	showWord(pickWord());
+	updateScore();
+</script>

@@ -1,0 +1,166 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="点字を探してみよう" pageSlug="find-braille">
+	<h1>点字を探してみよう</h1>
+	<p>
+		点字は、いろんな場所で使われているよ。ある人の通勤ルートをたどりながら、どこに点字があるか探してみよう。
+	</p>
+
+	<p id="progress"></p>
+
+	<h2 id="scene"></h2>
+	<p id="narration"></p>
+
+	<div id="placeholder" class="placeholder" role="img">
+		<button type="button" id="hotspot-button">しらべる</button>
+	</div>
+
+	<div id="reveal-area" hidden></div>
+
+	<p class="buttons">
+		<button type="button" id="next-button">つぎのばしょへ</button>
+	</p>
+	<p id="done-message" hidden>たびはこれでおしまいだよ。おつかれさま！</p>
+</Layout>
+
+<style>
+	.placeholder {
+		position: relative;
+		width: 100%;
+		max-width: 24rem;
+		aspect-ratio: 4 / 3;
+		background: #e8e8e8;
+		border: 1px dashed #999;
+		border-radius: 8px;
+		margin: 1rem 0;
+	}
+
+	#hotspot-button {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		font-size: 1rem;
+		padding: 0.5rem 0.8rem;
+	}
+
+	#reveal-area {
+		background: #f5f5f5;
+		border-radius: 8px;
+		padding: 0.8rem 1rem;
+		margin: 1rem 0;
+	}
+
+	#reveal-area .braille {
+		font-size: 1.8rem;
+	}
+
+	#reveal-area .trivia {
+		color: #555;
+		font-size: 0.95rem;
+	}
+
+	.buttons {
+		margin: 1rem 0;
+	}
+
+	.buttons button {
+		font-size: 1rem;
+		padding: 0.5rem 1rem;
+	}
+
+	#done-message {
+		font-weight: bold;
+	}
+</style>
+
+<script>
+	import { SPOTS } from "../data/townSpots";
+
+	let index = 0;
+	const foundIds = new Set<string>();
+
+	const sceneEl = document.getElementById("scene") as HTMLElement;
+	const narrationEl = document.getElementById("narration") as HTMLElement;
+	const placeholderEl = document.getElementById("placeholder") as HTMLElement;
+	const hotspotButton = document.getElementById("hotspot-button") as HTMLButtonElement;
+	const revealArea = document.getElementById("reveal-area") as HTMLElement;
+	const nextButton = document.getElementById("next-button") as HTMLButtonElement;
+	const progressEl = document.getElementById("progress") as HTMLElement;
+	const doneMessage = document.getElementById("done-message") as HTMLElement;
+
+	function totalBrailleSpots(): number {
+		return SPOTS.filter((s) => s.hasBraille).length;
+	}
+
+	function updateProgress() {
+		progressEl.textContent = `見つけた点字: ${foundIds.size} / ${totalBrailleSpots()}`;
+	}
+
+	function showSpot(i: number) {
+		const spot = SPOTS[i];
+		sceneEl.textContent = spot.scene;
+		narrationEl.textContent = spot.narration;
+		placeholderEl.setAttribute("aria-label", spot.imageAlt);
+
+		revealArea.replaceChildren();
+		revealArea.hidden = true;
+
+		if (spot.hasBraille) {
+			hotspotButton.hidden = false;
+			const x = spot.hotspot?.x ?? 50;
+			const y = spot.hotspot?.y ?? 50;
+			hotspotButton.style.left = `${x}%`;
+			hotspotButton.style.top = `${y}%`;
+		} else {
+			hotspotButton.hidden = true;
+		}
+
+		nextButton.hidden = i >= SPOTS.length - 1;
+		doneMessage.hidden = i < SPOTS.length - 1;
+
+		updateProgress();
+	}
+
+	hotspotButton.addEventListener("click", () => {
+		const spot = SPOTS[index];
+		foundIds.add(spot.id);
+		updateProgress();
+
+		revealArea.replaceChildren();
+		revealArea.hidden = false;
+
+		if (spot.brailleText || spot.meaning || spot.trivia) {
+			if (spot.brailleText) {
+				const p = document.createElement("p");
+				p.className = "braille";
+				p.textContent = spot.brailleText;
+				revealArea.appendChild(p);
+			}
+			if (spot.meaning) {
+				const p = document.createElement("p");
+				p.textContent = spot.meaning;
+				revealArea.appendChild(p);
+			}
+			if (spot.trivia) {
+				const p = document.createElement("p");
+				p.className = "trivia";
+				p.textContent = spot.trivia;
+				revealArea.appendChild(p);
+			}
+		} else {
+			const p = document.createElement("p");
+			p.textContent = "ここはまだじゅんびちゅうだよ。";
+			revealArea.appendChild(p);
+		}
+	});
+
+	nextButton.addEventListener("click", () => {
+		if (index < SPOTS.length - 1) {
+			index++;
+			showSpot(index);
+		}
+	});
+
+	showSpot(index);
+</script>

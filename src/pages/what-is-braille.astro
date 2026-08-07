@@ -1,0 +1,59 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="点字って何？" pageSlug="what-is-braille">
+	<h1>点字って何？</h1>
+	<p>
+		点字（てんじ）は、指で触ってよむ文字だよ。紙に小さな点をでこぼこに並べて、その点の並び方で文字を表しているんだ。
+	</p>
+	<p>
+		目の見えない人や、見えにくい人が、指先で点をなぞりながら読んだり、専用の道具で点を打って書いたりするよ。
+	</p>
+	<p>
+		6つの点の組み合わせで、ひらがなや数字、アルファベットなどを表すことができるんだ。
+	</p>
+	<p>縦ニ三つ、横ニ二つの点を使って、文字を作るんだよ。</p>
+
+	<figure class="cell-diagram">
+		<svg viewBox="0 0 160 220" role="img" aria-labelledby="cell-diagram-title" xmlns="http://www.w3.org/2000/svg">
+			<title id="cell-diagram-title">点字の1マスは、縦3つ・横2列、合計6つの点でできている図</title>
+			<rect x="10" y="10" width="140" height="200" rx="14" fill="none" stroke="#999" stroke-width="2" stroke-dasharray="6 4" />
+			<g font-family="sans-serif" font-size="20" fill="#333" text-anchor="middle">
+				<circle cx="50" cy="50" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="50" y="57">1</text>
+				<circle cx="50" cy="110" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="50" y="117">2</text>
+				<circle cx="50" cy="170" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="50" y="177">3</text>
+				<circle cx="110" cy="50" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="110" y="57">4</text>
+				<circle cx="110" cy="110" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="110" y="117">5</text>
+				<circle cx="110" cy="170" r="20" fill="#ddd" stroke="#666" stroke-width="2" />
+				<text x="110" y="177">6</text>
+			</g>
+		</svg>
+		<figcaption>点字の1マス。左の三つが１から3の点、右の三つが４から６の点だよ。</figcaption>
+	</figure>
+
+	<p>一つのますは64通りの組み合わせがあるんだ。</p>
+</Layout>
+
+<style>
+	.cell-diagram {
+		max-width: 12rem;
+		margin: 1.5rem 0;
+	}
+
+	.cell-diagram svg {
+		width: 100%;
+		height: auto;
+	}
+
+	.cell-diagram figcaption {
+		font-size: 0.9rem;
+		color: #555;
+		margin-top: 0.4rem;
+	}
+</style>

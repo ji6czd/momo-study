@@ -1,0 +1,91 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="自由に書いてみよう" pageSlug="write-freely">
+	<h1>自由に書いてみよう</h1>
+	<p>
+		<kbd>F</kbd><kbd>D</kbd><kbd>S</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>
+		の6つのキーで、点字を打ってみよう。
+	</p>
+	<p>
+		左手の指を <kbd>F</kbd><kbd>D</kbd><kbd>S</kbd>、右手の指を
+		<kbd>J</kbd><kbd>K</kbd><kbd>L</kbd> に置いて、点のある場所のキーをいっしょに押して、はなしてみてね。
+	</p>
+
+	<div class="practice">
+		<label for="braille-input">打った点字</label>
+		<textarea id="braille-input" rows="6" autocomplete="off" spellcheck="false"></textarea>
+
+		<div class="kana-box">
+			<span id="kana-output-label">よみ（カタカナ）</span>
+			<p id="kana-output" aria-live="polite" aria-labelledby="kana-output-label">
+				（読みこみ中…）
+			</p>
+		</div>
+	</div>
+</Layout>
+
+<style>
+	kbd {
+		display: inline-block;
+		min-width: 1.5em;
+		padding: 0.1em 0.4em;
+		border: 1px solid #888;
+		border-radius: 4px;
+		background: #f5f5f5;
+		font-family: inherit;
+		text-align: center;
+	}
+
+	.practice {
+		margin-top: 1.5rem;
+	}
+
+	#braille-input {
+		width: 100%;
+		max-width: 32rem;
+		font-size: 2rem;
+		line-height: 1.8;
+		resize: vertical;
+	}
+
+	.kana-box {
+		margin-top: 1rem;
+	}
+
+	#kana-output {
+		font-size: 1.5rem;
+	}
+</style>
+
+<script>
+	import init, { BrailleBackTranslator } from "momors-wasm";
+	import { attachBrailleInput } from "../lib/brailleInput";
+
+	const input = document.getElementById("braille-input") as HTMLTextAreaElement;
+	const kanaOutput = document.getElementById("kana-output") as HTMLElement;
+
+	let backTranslator: BrailleBackTranslator | null = null;
+
+	async function setup() {
+		await init();
+		backTranslator = new BrailleBackTranslator();
+		kanaOutput.textContent = "";
+		kanaOutput.textContent = backTranslator.backTranslate(input.value);
+	}
+
+	setup().catch((err) => {
+		kanaOutput.textContent = "(読みこみに失敗しました)";
+		console.error(err);
+	});
+
+	attachBrailleInput({ textarea: input });
+
+	// セルの確定(attachBrailleInputが発火させるinput)・Backspace等の編集、
+	// どちらもここでtextarea全体をまるごと再変換するので、部分的な追記によるズレが起きない。
+	input.addEventListener("input", () => {
+		if (!backTranslator) return;
+		kanaOutput.textContent = backTranslator.backTranslate(input.value);
+	});
+</script>

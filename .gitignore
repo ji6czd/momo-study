@@ -6,6 +6,12 @@ dist/
 # dependencies
 node_modules/
 
+# momors-wasm SDK (配布zipをvendor/に展開して使う。README参照)
+vendor/
+
+# vendor/data/からprepare-modelスクリプトが生成する点訳モデル(gzip圧縮、~17MB)
+public/models/
+
 # logs
 npm-debug.log*
 yarn-debug.log*

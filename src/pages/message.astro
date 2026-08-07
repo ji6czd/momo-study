@@ -1,0 +1,246 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="メッセージを書いてみよう" pageSlug="message">
+	<h1>メッセージを書いてみよう</h1>
+	<p>自己紹介でも、だれかへのメッセージでもいいから、点字カードとして書いてみよう。</p>
+	<p>
+		点字カードは、<strong>6行32ます</strong>で作ってみよう。このサイズの点字機は、比較的安く手に入るんだ。
+	</p>
+	<p>
+		もう一つ、大事なルールがあるよ。<strong>単語は行をまたげない</strong>んだ。1つの単語(かなのまとまり)の途中で行を変えることはできないよ。もし単語が行の残りマスに収まらないときは、その単語ごと次の行に送るんだ。
+	</p>
+
+	<h2>1. 書きたい文章を入力しよう</h2>
+	<label for="source-input">げんぶん(漢字まじりでOK)</label>
+	<textarea id="source-input" rows="3"></textarea>
+	<p class="buttons">
+		<button type="button" id="translate-button">てんやくする</button>
+	</p>
+	<p id="translate-status" aria-live="polite"></p>
+
+	<div id="answer-area" hidden>
+		<h2>2. 点字を打ってみよう</h2>
+		<p>
+			お手本は見せずに進めるよ。自分の力で打ってみよう。区切りは<kbd>Space</kbd
+			>キー、行を変えるときは<kbd>Enter</kbd>キーだよ。
+		</p>
+		<label for="braille-input">打った点字(6行32ます)</label>
+		<textarea id="braille-input" rows="6" cols="32" wrap="off" autocomplete="off" spellcheck="false"
+		></textarea>
+
+		<p class="buttons">
+			<button type="button" id="check-button">こたえあわせ</button>
+		</p>
+
+		<div id="result-area" aria-live="polite"></div>
+		<p id="result-summary"></p>
+
+		<p class="legend">
+			見方: <span class="cell match">⠁</span>あってる /
+			<span class="cell missing">⠁</span>足りない /
+			<span class="cell extra">⠁</span>よぶん /
+			<span class="cell missing">⏎</span>・<span class="cell extra">⏎</span>行の変え方がちがう
+		</p>
+	</div>
+</Layout>
+
+<style>
+	kbd {
+		display: inline-block;
+		min-width: 1.5em;
+		padding: 0.1em 0.4em;
+		border: 1px solid #888;
+		border-radius: 4px;
+		background: #f5f5f5;
+		font-family: inherit;
+		text-align: center;
+	}
+
+	label {
+		display: block;
+		margin-bottom: 0.3rem;
+	}
+
+	#source-input {
+		width: 100%;
+		max-width: 32rem;
+		font-size: 1.2rem;
+	}
+
+	#braille-input {
+		font-size: 1.8rem;
+		line-height: 1.6;
+		width: 34ch;
+		resize: none;
+	}
+
+	.buttons {
+		margin: 0.8rem 0;
+	}
+
+	.buttons button {
+		font-size: 1rem;
+		padding: 0.4rem 0.8rem;
+	}
+
+	#result-area {
+		font-size: 1.8rem;
+		line-height: 1.6;
+		margin-top: 1rem;
+	}
+
+	.cell {
+		display: inline-block;
+	}
+
+	.cell.match {
+		color: inherit;
+	}
+
+	.cell.missing {
+		background: #ffe1e1;
+		color: #b3261e;
+		text-decoration: underline;
+		border-radius: 2px;
+	}
+
+	.cell.extra {
+		background: #fff1c2;
+		color: #8a6100;
+		text-decoration: line-through;
+		border-radius: 2px;
+	}
+
+	#result-summary {
+		font-weight: bold;
+	}
+
+	.legend {
+		color: #555;
+		font-size: 0.9rem;
+	}
+
+	.legend .cell {
+		font-size: 1.1rem;
+		padding: 0 0.2em;
+	}
+</style>
+
+<script>
+	import init, { Predictor, BrailleTranslator } from "momors-wasm";
+	import { attachBrailleInput } from "../lib/brailleInput";
+	import { loadModel } from "../lib/loadModel";
+	import { diffBraille } from "../lib/brailleDiff";
+
+	const LINE_WIDTH = 32;
+	const LINE_COUNT = 6;
+
+	const sourceInput = document.getElementById("source-input") as HTMLTextAreaElement;
+	const translateButton = document.getElementById("translate-button") as HTMLButtonElement;
+	const translateStatus = document.getElementById("translate-status") as HTMLElement;
+	const answerArea = document.getElementById("answer-area") as HTMLElement;
+	const brailleInput = document.getElementById("braille-input") as HTMLTextAreaElement;
+	const checkButton = document.getElementById("check-button") as HTMLButtonElement;
+	const resultArea = document.getElementById("result-area") as HTMLElement;
+	const resultSummary = document.getElementById("result-summary") as HTMLElement;
+
+	attachBrailleInput({ textarea: brailleInput });
+
+	let translator: BrailleTranslator | null = null;
+	let predictor: Predictor | null = null;
+	let correctText: string | null = null;
+
+	async function ensureReady() {
+		if (translator && predictor) return;
+		await init();
+		translator = new BrailleTranslator();
+		const modelBytes = await loadModel({
+			onProgress(loaded, total) {
+				if (total) {
+					const pct = Math.round((loaded / total) * 100);
+					translateStatus.textContent = `モデルを読みこみ中… ${pct}%`;
+				} else {
+					translateStatus.textContent = `モデルを読みこみ中… ${(loaded / 1024 / 1024).toFixed(1)}MB`;
+				}
+			},
+		});
+		predictor = new Predictor(modelBytes);
+	}
+
+	function wrapBraille(braille: string, lineWidth: number): string[] {
+		const chunks = braille.match(/[^⠀]+⠀*/gu) ?? [];
+		const lines: string[] = [];
+		let current = "";
+		for (const chunk of chunks) {
+			if (current.length > 0 && current.length + chunk.length > lineWidth) {
+				lines.push(current.replace(/⠀+$/u, ""));
+				current = "";
+			}
+			current += chunk;
+		}
+		if (current) lines.push(current.replace(/⠀+$/u, ""));
+		return lines;
+	}
+
+	translateButton.addEventListener("click", async () => {
+		const text = sourceInput.value.trim();
+		if (!text) return;
+		translateButton.disabled = true;
+		translateStatus.textContent = "モデルを読みこみ中…(初回は50MBぶんを17MBに圧縮したものを取得するので少し待ってね)";
+		try {
+			await ensureReady();
+			const kana = predictor!.predict(text).kana;
+			const braille = translator!.translateJapanese(kana).braille;
+			const lines = wrapBraille(braille, LINE_WIDTH);
+			correctText = lines.join("\n");
+
+			answerArea.hidden = false;
+			resultArea.innerHTML = "";
+			resultSummary.textContent = "";
+			brailleInput.value = "";
+			brailleInput.focus();
+
+			if (lines.length > LINE_COUNT) {
+				translateStatus.textContent = `てんやくできたよ。ただし${lines.length}行になっていて、${LINE_COUNT}行にはおさまらないよ。文章を短くしてみよう。`;
+			} else {
+				translateStatus.textContent = "てんやくできたよ。下の欄に、自分でも点字を打ってみよう。";
+			}
+		} catch (err) {
+			translateStatus.textContent = "てんやくに失敗しました。";
+			console.error(err);
+		} finally {
+			translateButton.disabled = false;
+		}
+	});
+
+	checkButton.addEventListener("click", () => {
+		if (correctText === null) return;
+		const ops = diffBraille(correctText, brailleInput.value);
+
+		resultArea.innerHTML = "";
+		let matchCount = 0;
+		let totalCount = 0;
+		for (const op of ops) {
+			if (op.cell === "\n") {
+				if (op.type === "match") {
+					resultArea.appendChild(document.createElement("br"));
+				} else {
+					const span = document.createElement("span");
+					span.className = `cell ${op.type}`;
+					span.textContent = "⏎";
+					resultArea.appendChild(span);
+				}
+				continue;
+			}
+			const span = document.createElement("span");
+			span.className = `cell ${op.type}`;
+			span.textContent = op.cell;
+			resultArea.appendChild(span);
+			totalCount++;
+			if (op.type === "match") matchCount++;
+		}
+		resultSummary.textContent = `${matchCount} / ${totalCount} マス一致`;
+	});
+</script>
