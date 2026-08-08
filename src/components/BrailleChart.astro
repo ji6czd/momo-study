@@ -271,19 +271,22 @@ const NUMBER_SIGNS = [
 		line-height: 1;
 	}
 
+	/* 非モーダル(show())で開く、右下固定のパネル。裏の入力欄を隠したりロックしたりしないよう、
+	   画面全体を覆うモーダルにはしていない。位置はネイティブの中央寄せに頼らず自前で指定する。 */
 	dialog#braille-chart-dialog {
-		width: min(42rem, 92vw);
-		max-height: 85vh;
+		position: fixed;
+		right: 1rem;
+		bottom: 5rem;
+		left: auto;
+		width: min(18rem, 90vw);
+		max-height: min(75vh, 40rem);
 		overflow-y: auto;
-		margin: auto;
-		padding: 1.2rem 1.3rem 1.6rem;
-		border: none;
+		margin: 0;
+		padding: 1rem 1.1rem 1.3rem;
+		border: 1px solid #ddd;
 		border-radius: 12px;
-		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
-	}
-
-	dialog#braille-chart-dialog::backdrop {
-		background: rgba(0, 0, 0, 0.45);
+		box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+		z-index: 41;
 	}
 
 	.dialog-header {
@@ -295,6 +298,7 @@ const NUMBER_SIGNS = [
 
 	.dialog-header h2 {
 		margin: 0;
+		font-size: 1.2rem;
 	}
 
 	.close-button {
@@ -367,9 +371,23 @@ const NUMBER_SIGNS = [
 	const dialog = document.getElementById("braille-chart-dialog") as HTMLDialogElement | null;
 	const closeButton = document.getElementById("braille-chart-close") as HTMLButtonElement | null;
 
-	openButton?.addEventListener("click", () => dialog?.showModal());
+	// showModal()ではなくshow()で開く。裏の入力欄をロックしない(モーダルにしない)ことで、
+	// 表を出したまま入力欄をクリックして打ち続けられるようにするため。
+	// 「外側クリックで閉じる」は付けない: 入力欄をクリックしてフォーカスを移す操作自体が
+	// 外側クリックになってしまい、打とうとした瞬間にパネルが閉じてしまうため。
+	openButton?.addEventListener("click", () => {
+		if (!dialog) return;
+		if (dialog.open) {
+			dialog.close();
+		} else {
+			dialog.show();
+		}
+	});
 	closeButton?.addEventListener("click", () => dialog?.close());
-	dialog?.addEventListener("click", (e) => {
-		if (e.target === dialog) dialog.close();
+
+	document.addEventListener("keydown", (e) => {
+		if (e.key === "Escape" && dialog?.open) {
+			dialog.close();
+		}
 	});
 </script>
