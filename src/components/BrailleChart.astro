@@ -28,7 +28,11 @@ const showGojuon = unlocked("gojuon-practice");
 const showYoon = unlocked("yoon");
 const showNumbers = unlocked("numbers");
 const showPunctuation = unlocked("sentences");
-const hasAnySection = showGojuon || showYoon || showNumbers || showPunctuation;
+
+// gojuon-practiceページ自体は五十音・濁音半濁音の表をsticky表示で常に画面内に出しているので、
+// このページに限ってはパネルの中身(この時点ではその2つだけ)がまるごと重複する。ボタンごと出さない。
+const hasOwnPersistentReference = pageSlug === "gojuon-practice";
+const hasAnySection = !hasOwnPersistentReference && (showGojuon || showYoon || showNumbers || showPunctuation);
 
 const NUMBER_SIGNS = [
 	{ label: "数符", braille: NUMBER_SIGN, description: "このあとが数字だよ、という印" },
