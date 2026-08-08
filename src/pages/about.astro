@@ -1,0 +1,64 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="このサイトについて">
+	<h1>このサイトについて</h1>
+
+	<h2>入力について</h2>
+	<ul>
+		<li>打った点字や書いた文章などの入力内容は、どこにも送信されません。すべてブラウザの中だけで処理しています。</li>
+		<li>入力内容や学習の進み具合をディスク(端末)に保存することもありません。ページを閉じたり再読み込みしたりすると消えます。</li>
+		<li>Cookieも使用していません。</li>
+	</ul>
+
+	<h2>使用ライブラリ</h2>
+	<table>
+		<thead>
+			<tr>
+				<th scope="col">名前</th>
+				<th scope="col">ライセンス</th>
+				<th scope="col">用途</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><a href="https://astro.build/">Astro</a></td>
+				<td>MIT License</td>
+				<td>サイトの土台(静的サイトジェネレーター)</td>
+			</tr>
+			<tr>
+				<td><a href="https://github.com/ji6czd/momo">momors-wasm</a></td>
+				<td>BSD-3-Clause</td>
+				<td>かな⇄点字の変換・点訳予測</td>
+			</tr>
+			<tr>
+				<td><a href="https://dejavu-fonts.github.io/">DejaVu Sans</a></td>
+				<td><a href="https://dejavu-fonts.github.io/License.html">Bitstream Vera由来のライセンス</a></td>
+				<td>点字のグリフを表示するフォント</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>Copyright</h2>
+	<p>© 2026 KIRIAKE Masanori</p>
+	<p>
+		このサイト自体のソースコードは<a href="https://github.com/ji6czd/momo-study/blob/main/LICENSE"
+			>BSD-3-Clauseライセンス</a
+		>で公開しています。
+	</p>
+</Layout>
+
+<style>
+	table {
+		border-collapse: collapse;
+		margin: 1rem 0 1.5rem;
+	}
+
+	th,
+	td {
+		border: 1px solid #ccc;
+		padding: 0.4rem 0.7rem;
+		text-align: left;
+	}
+</style>

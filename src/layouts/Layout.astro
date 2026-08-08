@@ -51,6 +51,9 @@ const brailleFontFaceCss = `
 				)
 			}
 		</main>
+		<footer>
+			<a href={withBase("about")}>このサイトについて</a>
+		</footer>
 		<BrailleChart pageSlug={pageSlug} />
 	</body>
 </html>
@@ -84,6 +87,17 @@ const brailleFontFaceCss = `
 	.next-page a {
 		font-size: 1.1rem;
 		font-weight: bold;
+	}
+
+	footer {
+		margin-top: 2rem;
+		padding: 1rem 0;
+		text-align: center;
+		font-size: 0.85rem;
+	}
+
+	footer a {
+		color: #555;
 	}
 </style>
 
