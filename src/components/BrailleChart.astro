@@ -1,0 +1,375 @@
+---
+import { PAGES } from "../data/pages";
+import { GOJUON_COLUMNS, GOJUON_ROWS, DAKUON_GROUPS } from "../data/gojuon";
+import { YOON_COLUMNS, YOON_SEION_ROWS, YOON_DAKUON_ROWS, SPECIAL_SOUNDS } from "../data/yoon";
+import { DIGITS, NUMBER_SIGN, LINK_SIGN } from "../data/numbers";
+import { PUNCTUATION_SIGNS } from "../data/punctuation";
+
+interface Props {
+	/** Layoutに渡しているのと同じ、data/pages.ts上のスラッグ。ここまでに習った表だけを出すのに使う。 */
+	pageSlug?: string;
+}
+
+const { pageSlug } = Astro.props;
+
+function pageIndex(slug: string): number {
+	return PAGES.findIndex((p) => p.slug === slug);
+}
+
+const currentIndex = pageSlug ? pageIndex(pageSlug) : -1;
+
+/** 現在のページ(currentIndex)の時点で、unlockSlugのページまで読み終えているか。 */
+function unlocked(unlockSlug: string): boolean {
+	if (currentIndex === -1) return false;
+	return currentIndex >= pageIndex(unlockSlug);
+}
+
+const showGojuon = unlocked("gojuon-practice");
+const showYoon = unlocked("yoon");
+const showNumbers = unlocked("numbers");
+const showPunctuation = unlocked("sentences");
+const hasAnySection = showGojuon || showYoon || showNumbers || showPunctuation;
+
+const NUMBER_SIGNS = [
+	{ label: "数符", braille: NUMBER_SIGN, description: "このあとが数字だよ、という印" },
+	{ label: "繋ぎ符", braille: LINK_SIGN, description: "数字がまぎらわしい音の前で終わることを示す印" },
+];
+---
+
+{
+	hasAnySection && (
+		<Fragment>
+			<button type="button" id="braille-chart-open" class="chart-open-button">
+				<span class="braille" aria-hidden="true">⠿</span>
+				点字表を見る
+			</button>
+
+			<dialog id="braille-chart-dialog" aria-labelledby="braille-chart-title">
+				<div class="dialog-header">
+					<h2 id="braille-chart-title">点字表</h2>
+					<button type="button" id="braille-chart-close" class="close-button" aria-label="閉じる">
+						×
+					</button>
+				</div>
+				<p class="dialog-note">これまでに出てきた点字を、まとめて見られるよ。</p>
+
+				{showGojuon && (
+					<section>
+						<h3>五十音</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col" />
+										{GOJUON_COLUMNS.map((col) => (
+											<th scope="col">{col}</th>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									{GOJUON_ROWS.map((row) => (
+										<tr>
+											<th scope="row">{row.label}</th>
+											{row.cells.map((cell) =>
+												cell ? (
+													<td>
+														<span class="kana">{cell.kana}</span>
+														<span class="braille">{cell.braille}</span>
+													</td>
+												) : (
+													<td aria-hidden="true" />
+												),
+											)}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+
+						<h3>濁音・半濁音</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col" />
+										{GOJUON_COLUMNS.map((col) => (
+											<th scope="col">{col}</th>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									{DAKUON_GROUPS.map((group) => (
+										<tr>
+											<th scope="row">{group.label}</th>
+											{group.cells.map((cell) => (
+												<td>
+													<span class="kana">{cell.kana}</span>
+													<span class="braille">{cell.braille}</span>
+												</td>
+											))}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				)}
+
+				{showYoon && (
+					<section>
+						<h3>拗音</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col" />
+										{YOON_COLUMNS.map((col) => (
+											<th scope="col">{col}</th>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									{[...YOON_SEION_ROWS, ...YOON_DAKUON_ROWS].map((row) => (
+										<tr>
+											<th scope="row">{row.label}</th>
+											{row.cells.map((cell) => (
+												<td>
+													<span class="kana">{cell.kana}</span>
+													<span class="braille">{cell.braille}</span>
+												</td>
+											))}
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+
+						<h3>特殊音</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">文字</th>
+										<th scope="col">点字</th>
+										<th scope="col">はたらき</th>
+									</tr>
+								</thead>
+								<tbody>
+									{SPECIAL_SOUNDS.map((s) => (
+										<tr>
+											<th scope="row">{s.label}</th>
+											<td class="braille">{s.braille}</td>
+											<td class="description">{s.description}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				)}
+
+				{showNumbers && (
+					<section>
+						<h3>数字</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										{DIGITS.map((d) => (
+											<th scope="col">{d.digit}</th>
+										))}
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										{DIGITS.map((d) => (
+											<td class="braille">{d.braille}</td>
+										))}
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">記号</th>
+										<th scope="col">点字</th>
+										<th scope="col">はたらき</th>
+									</tr>
+								</thead>
+								<tbody>
+									{NUMBER_SIGNS.map((s) => (
+										<tr>
+											<th scope="row">{s.label}</th>
+											<td class="braille">{s.braille}</td>
+											<td class="description">{s.description}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				)}
+
+				{showPunctuation && (
+					<section>
+						<h3>句読点</h3>
+						<div class="table-scroll">
+							<table>
+								<thead>
+									<tr>
+										<th scope="col">記号</th>
+										<th scope="col">点字</th>
+										<th scope="col">はたらき</th>
+									</tr>
+								</thead>
+								<tbody>
+									{PUNCTUATION_SIGNS.map((s) => (
+										<tr>
+											<th scope="row">{s.label}</th>
+											<td class="braille">{s.braille}</td>
+											<td class="description">{s.description}</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				)}
+			</dialog>
+		</Fragment>
+	)
+}
+
+<style>
+	.chart-open-button {
+		position: fixed;
+		right: 1rem;
+		bottom: 1rem;
+		z-index: 40;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.7rem 1.1rem;
+		font-size: 1rem;
+		font-weight: bold;
+		color: #fff;
+		background: #2b6cb0;
+		border: none;
+		border-radius: 999px;
+		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+		cursor: pointer;
+	}
+
+	.chart-open-button:hover {
+		background: #235a94;
+	}
+
+	.chart-open-button .braille {
+		font-size: 1.3rem;
+		line-height: 1;
+	}
+
+	dialog#braille-chart-dialog {
+		width: min(42rem, 92vw);
+		max-height: 85vh;
+		overflow-y: auto;
+		margin: auto;
+		padding: 1.2rem 1.3rem 1.6rem;
+		border: none;
+		border-radius: 12px;
+		box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+	}
+
+	dialog#braille-chart-dialog::backdrop {
+		background: rgba(0, 0, 0, 0.45);
+	}
+
+	.dialog-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.dialog-header h2 {
+		margin: 0;
+	}
+
+	.close-button {
+		flex: 0 0 auto;
+		width: 2.2rem;
+		height: 2.2rem;
+		font-size: 1.2rem;
+		line-height: 1;
+		border: 1px solid #ccc;
+		border-radius: 999px;
+		background: #f5f5f5;
+		cursor: pointer;
+	}
+
+	.dialog-note {
+		color: #555;
+		font-size: 0.9rem;
+		margin-top: 0.3rem;
+	}
+
+	section {
+		margin-top: 1.4rem;
+	}
+
+	section h3 {
+		margin-bottom: 0.4rem;
+	}
+
+	.table-scroll {
+		overflow-x: auto;
+		margin-bottom: 1rem;
+	}
+
+	table {
+		border-collapse: collapse;
+	}
+
+	th,
+	td {
+		border: 1px solid #ccc;
+		padding: 0.25rem 0.5rem;
+		text-align: center;
+		white-space: nowrap;
+	}
+
+	td.braille {
+		font-size: 1.2rem;
+	}
+
+	/* td内の要素は縦に積みたいのでblock指定する*/
+	td .kana {
+		display: block;
+		font-size: 0.9rem;
+	}
+
+	td .braille {
+		display: block;
+		font-size: 1.2rem;
+	}
+
+	.description {
+		text-align: left;
+		font-size: 0.9rem;
+		white-space: normal;
+	}
+</style>
+
+<script>
+	const openButton = document.getElementById("braille-chart-open") as HTMLButtonElement | null;
+	const dialog = document.getElementById("braille-chart-dialog") as HTMLDialogElement | null;
+	const closeButton = document.getElementById("braille-chart-close") as HTMLButtonElement | null;
+
+	openButton?.addEventListener("click", () => dialog?.showModal());
+	closeButton?.addEventListener("click", () => dialog?.close());
+	dialog?.addEventListener("click", (e) => {
+		if (e.target === dialog) dialog.close();
+	});
+</script>

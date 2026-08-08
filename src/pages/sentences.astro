@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { SENTENCE_WORDS as WORDS } from "../data/words";
+import { PUNCTUATION_SIGNS } from "../data/punctuation";
 ---
 
 <Layout title="文章を書いてみよう" pageSlug="sentences">
@@ -23,16 +24,15 @@ import { SENTENCE_WORDS as WORDS } from "../data/words";
 			</tr>
 		</thead>
 		<tbody>
-			<tr>
-				<th scope="row">。(句点)</th>
-				<td class="braille">⠲</td>
-				<td class="description">文の終わりに書く。あとに文が続くときは2マスあける</td>
-			</tr>
-			<tr>
-				<th scope="row">、(読点)</th>
-				<td class="braille">⠰</td>
-				<td class="description">文の区切りに書く。あとに文が続くときは1マスあける</td>
-			</tr>
+			{
+				PUNCTUATION_SIGNS.map((s) => (
+					<tr>
+						<th scope="row">{s.label}</th>
+						<td class="braille">{s.braille}</td>
+						<td class="description">{s.description}</td>
+					</tr>
+				))
+			}
 		</tbody>
 	</table>
 
