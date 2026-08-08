@@ -16,7 +16,7 @@ import Layout from "../layouts/Layout.astro";
 	<label for="source-input">げんぶん(漢字まじりでOK)</label>
 	<textarea id="source-input" rows="3"></textarea>
 	<p class="buttons">
-		<button type="button" id="translate-button">てんやくする</button>
+		<button type="button" id="translate-button">点字にする</button>
 	</p>
 	<p id="translate-status" aria-live="polite"></p>
 
@@ -160,9 +160,9 @@ import Layout from "../layouts/Layout.astro";
 			onProgress(loaded, total) {
 				if (total) {
 					const pct = Math.round((loaded / total) * 100);
-					translateStatus.textContent = `モデルを読みこみ中… ${pct}%`;
+					translateStatus.textContent = `準備中… ${pct}%`;
 				} else {
-					translateStatus.textContent = `モデルを読みこみ中… ${(loaded / 1024 / 1024).toFixed(1)}MB`;
+					translateStatus.textContent = `準備中… ${(loaded / 1024 / 1024).toFixed(1)}MB`;
 				}
 			},
 		});
@@ -188,7 +188,7 @@ import Layout from "../layouts/Layout.astro";
 		const text = sourceInput.value.trim();
 		if (!text) return;
 		translateButton.disabled = true;
-		translateStatus.textContent = "モデルを読みこみ中…(初回は50MBぶんを17MBに圧縮したものを取得するので少し待ってね)";
+		translateStatus.textContent = "準備中… 少し待ってね)";
 		try {
 			await ensureReady();
 			const kana = predictor!.predict(text).kana;
@@ -203,9 +203,9 @@ import Layout from "../layouts/Layout.astro";
 			brailleInput.focus();
 
 			if (lines.length > LINE_COUNT) {
-				translateStatus.textContent = `てんやくできたよ。ただし${lines.length}行になっていて、${LINE_COUNT}行にはおさまらないよ。文章を短くしてみよう。`;
+				translateStatus.textContent = `点字にできたよ。ただし${lines.length}行になっていて、${LINE_COUNT}行にはおさまらないよ。文章を短くしてみよう。`;
 			} else {
-				translateStatus.textContent = "てんやくできたよ。下の欄に、自分でも点字を打ってみよう。";
+				translateStatus.textContent = "点字にできたよ。下の欄に、自分でも点字を打ってみよう。";
 			}
 		} catch (err) {
 			translateStatus.textContent = "てんやくに失敗しました。";
