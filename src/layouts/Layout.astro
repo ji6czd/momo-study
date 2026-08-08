@@ -15,10 +15,10 @@ const nextPage = pageSlug ? getNextPage(pageSlug) : null;
 
 // @font-face の url() はCSSカスタムプロパティを解決できない(要素に紐付かないため)ので、
 // base込みのURLをビルド時に文字列として直接埋め込む。
-const brailleFontUrl = withBase("fonts/dejavu/DejaVuSansMono.ttf");
+const brailleFontUrl = withBase("fonts/dejavu/DejaVuSans.ttf");
 const brailleFontFaceCss = `
 	@font-face {
-		font-family: "DejaVu Sans Mono";
+		font-family: "DejaVu Sans (Braille)";
 		src: url("${brailleFontUrl}") format("truetype");
 		font-display: swap;
 	}
@@ -81,13 +81,16 @@ const brailleFontFaceCss = `
 
 <style is:global>
 	/*
-	 * 点字表示に使うフォント。DejaVu Sans Mono(自己ホスト、public/fonts/dejavu/)を
-	 * 第一候補にし、無ければ環境依存のmonospaceにフォールバックする。
+	 * 点字表示に使うフォント。DejaVu Sans(自己ホスト、public/fonts/dejavu/)を第一候補にする。
+	 * "Mono"の方は点字グリフを1つも持っていなかった(fonttoolsで確認済み)ので、通常版の
+	 * DejaVu Sansを使っている。プロポーショナルフォントだが、点字グリフ同士の字送り幅は
+	 * 統一されている(fonttoolsで確認済み: 全256グリフが1500unit)ので、点字だけを並べる
+	 * 用途では等幅として振る舞う。無ければ環境依存のmonospaceにフォールバックする。
 	 * is:globalなのは、各ページ(スロットされた側)の要素にも効かせるため
 	 * (Astroの通常のスコープ付きスタイルはスロット先の要素には効かない)。
 	 */
 	:root {
-		--font-braille: "DejaVu Sans Mono", monospace;
+		--font-braille: "DejaVu Sans (Braille)", monospace;
 	}
 
 	.braille,
