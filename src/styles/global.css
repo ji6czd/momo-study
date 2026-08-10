@@ -1,0 +1,118 @@
+/*
+ * サイト全体で繰り返し使う共通スタイル。ページ単体にしか関係ないスタイルは
+ * 各.astroファイル側の<style>に残し、複数ページにまたがるものだけをここに集約する。
+ */
+
+:root {
+	--font-braille: "DejaVu Sans (Braille)", monospace;
+}
+
+.braille,
+.braille-example,
+#braille-input,
+#result-area {
+	font-family: var(--font-braille);
+}
+
+kbd {
+	display: inline-block;
+	min-width: 1.5em;
+	padding: 0.1em 0.4em;
+	border: 1px solid #888;
+	border-radius: 4px;
+	background: #f5f5f5;
+	font-family: inherit;
+	text-align: center;
+}
+
+label {
+	display: block;
+	margin-bottom: 0.3rem;
+	font-weight: bold;
+}
+
+/* かな⇄点字の対応表など、データを並べる表の共通見た目 */
+table {
+	border-collapse: collapse;
+	margin: 1rem 0 1.5rem;
+}
+
+caption {
+	font-weight: bold;
+	text-align: left;
+	margin-bottom: 0.3rem;
+}
+
+th,
+td {
+	border: 1px solid #ccc;
+	padding: 0.3rem 0.6rem;
+	text-align: center;
+}
+
+td .kana {
+	display: block;
+	font-size: 1rem;
+}
+
+.braille {
+	font-size: 1.3rem;
+}
+
+td .braille {
+	display: block;
+}
+
+.description {
+	text-align: left;
+	font-size: 0.95rem;
+}
+
+/* かこみつきの見本テキスト */
+.example,
+.braille-example {
+	font-size: 1.3rem;
+	padding: 0.5rem 0.8rem;
+	background: #f5f5f5;
+	border-radius: 4px;
+	display: inline-block;
+}
+
+/* F/D/S/J/K/Lで打つ、点字入力欄の共通サイズ */
+.braille-textarea {
+	width: 100%;
+	max-width: 32rem;
+	font-size: 2rem;
+	line-height: 1.8;
+	resize: vertical;
+}
+
+.word-prompt {
+	font-size: 1.8rem;
+	font-weight: bold;
+}
+
+.buttons {
+	display: flex;
+	gap: 0.5rem;
+	margin: 0.8rem 0;
+}
+
+.buttons button {
+	font-size: 1rem;
+	padding: 0.4rem 0.8rem;
+}
+
+#feedback.correct {
+	color: #0a7a2f;
+	font-weight: bold;
+}
+
+#feedback.incorrect {
+	color: #b3261e;
+	font-weight: bold;
+}
+
+#score {
+	color: #555;
+}
