@@ -1,0 +1,245 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { GOJUON_ROWS, DAKUON_GROUPS } from "../data/gojuon";
+
+const aRow = GOJUON_ROWS.find((r) => r.label === "あ行")!;
+const kaRow = GOJUON_ROWS.find((r) => r.label === "か行")!;
+
+const gaGroup = DAKUON_GROUPS.find((g) => g.label === "が行")!;
+const gaChar = gaGroup.cells[0];
+const paGroup = DAKUON_GROUPS.find((g) => g.label === "ぱ行")!;
+const paChar = paGroup.cells[0];
+
+/** 行ごとに、母音の形へ足す点。あ行は母音そのもの、や行・わ行・んは足し算のルールに当てはまらない例外。 */
+const EXTRA_DOTS: Record<string, string> = {
+	"あ行": "母音そのもの",
+	"か行": "6",
+	"さ行": "5、6",
+	"た行": "3、5",
+	"な行": "3",
+	"は行": "3、6",
+	"ま行": "3、5、6",
+	"や行": "例外",
+	"ら行": "5",
+	"わ行": "例外",
+	"ん": "例外",
+};
+---
+
+<Layout title="五十音を学ぼう" pageSlug="gojuon-learn">
+	<h1>五十音を学ぼう</h1>
+	<p>
+		これから、五十音(あ・い・う…)を点字でどう書くか見ていくよ。実は点字の五十音には、覚えやすくなる仕組みがかくれているんだ。
+	</p>
+
+	<h2>どうやってできてるのかな？</h2>
+	<p>
+		点字の五十音は、<strong>母音</strong>と<strong>子音</strong>をべつべつの点で表す、というルールで作られているんだ。
+	</p>
+
+	<figure class="cell-diagram">
+		<svg viewBox="0 0 160 220" role="img" aria-labelledby="vowel-consonant-title" xmlns="http://www.w3.org/2000/svg">
+			<title id="vowel-consonant-title">点字の6つの点のうち、1・2・4の点が母音を、3・5・6の点が子音を表すことを示す図</title>
+			<rect x="10" y="10" width="140" height="200" rx="14" fill="none" stroke="#999" stroke-width="2" stroke-dasharray="6 4" />
+			<g font-family="sans-serif" font-size="20" text-anchor="middle">
+				<circle cx="50" cy="50" r="20" class="dot vowel" />
+				<text x="50" y="57">1</text>
+				<circle cx="50" cy="110" r="20" class="dot vowel" />
+				<text x="50" y="117">2</text>
+				<circle cx="50" cy="170" r="20" class="dot consonant" />
+				<text x="50" y="177">3</text>
+				<circle cx="110" cy="50" r="20" class="dot vowel" />
+				<text x="110" y="57">4</text>
+				<circle cx="110" cy="110" r="20" class="dot consonant" />
+				<text x="110" y="117">5</text>
+				<circle cx="110" cy="170" r="20" class="dot consonant" />
+				<text x="110" y="177">6</text>
+			</g>
+		</svg>
+		<figcaption>
+			<span class="swatch vowel"></span>1・2・4の点が母音を、<span class="swatch consonant"></span>3・5・6の点が子音を表すよ。
+		</figcaption>
+	</figure>
+
+	<p>
+		<strong>1、2、4の点で母音を表すよ。</strong>
+		あ行の点字を見ると、使われているのはいつも1・2・4の点だけ。母音によって使う点の数はちがうけど、この3つの点しか出てこないんだ。
+	</p>
+
+	<p>
+		<strong>3、5、6の点を足すと子音になるよ。</strong>
+		たとえば、か行はあ行の形に「6の点」を足しただけの形なんだ。
+	</p>
+
+	<table>
+		<caption>あ行とか行をくらべてみよう</caption>
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				{aRow.cells.map((cell) => cell && <th scope="col">{cell.kana}</th>)}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">{aRow.label}</th>
+				{aRow.cells.map((cell) => cell && (
+					<td>
+						<span class="braille">{cell.braille}</span>
+					</td>
+				))}
+			</tr>
+			<tr>
+				<th scope="row">{kaRow.label}</th>
+				{kaRow.cells.map((cell) => cell && (
+					<td>
+						<span class="braille">{cell.braille}</span>
+					</td>
+				))}
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		ほかの行も、あ行の形に決まった点を足してできているよ。行ごとに、足す点が決まっているんだ。
+	</p>
+
+	<table>
+		<caption>行ごとに足す点</caption>
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				{GOJUON_ROWS.map((row) => <th scope="col">{row.label}</th>)}
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">足す点</th>
+				{GOJUON_ROWS.map((row) => <td>{EXTRA_DOTS[row.label]}</td>)}
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		<strong>ちょっと違うこともあるけど、</strong>
+		や行・わ行・んは、この足し算のルールに当てはまらない特別な形をしているよ。数は少ないから、そのまま形で覚えちゃおう。
+	</p>
+
+	<p>
+		<strong>濁点や半濁点は、後ろではなく前に書くよ。</strong>
+		かなでは「か」に「゛」を足して「が」と書くよね。でも点字では逆で、濁点を表すマスを<strong>先に</strong>書いて、そのあとに「か」を書くんだ。
+	</p>
+
+	<table>
+		<caption>濁点・半濁点のつけ方</caption>
+		<thead>
+			<tr>
+				<th scope="col">できあがる文字</th>
+				<th scope="col">点字</th>
+				<th scope="col">内訳</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">{gaChar.kana}</th>
+				<td class="braille">{gaChar.braille}</td>
+				<td class="description">濁点符(⠐) + か(⠡)</td>
+			</tr>
+			<tr>
+				<th scope="row">{paChar.kana}</th>
+				<td class="braille">{paChar.braille}</td>
+				<td class="description">半濁点符(⠠) + は(⠥)</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<h2>似てること違うこと</h2>
+
+	<p>
+		<strong>点字はローマ字みたいだね。</strong>
+		ローマ字で「か」は"ka"、子音の"k"と母音の"a"を組み合わせて書くよね。点字も同じように、子音を表す点と母音を表す点を組み合わせて1マスを作っているんだ。文字は2つじゃなくて1マスにまとまっているけど、考え方はローマ字とそっくりだね。
+	</p>
+
+	<table>
+		<caption>「か」の書き方をくらべてみよう</caption>
+		<thead>
+			<tr>
+				<th scope="col"></th>
+				<th scope="col">子音の部分</th>
+				<th scope="col">母音の部分</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<th scope="row">ローマ字</th>
+				<td>k</td>
+				<td>a</td>
+			</tr>
+			<tr>
+				<th scope="row">点字</th>
+				<td>6の点</td>
+				<td>あの形(<span class="braille">⠁</span>)</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<p>
+		<strong>濁点は後に書かずに前に書くんだね。</strong>
+		かなを書くときは「か」を書いてから「゛」を書き足すよね。でも点字は逆で、濁点を表すマスを先に書いて、そのあとに「か」を書くんだ。「読む順番」と「書き足す順番」が、かなと点字で逆になっているのがおもしろいところだね。
+	</p>
+
+	<p>
+		仕組みがわかったところで、次のページでは実際に五十音表を見ながら点字を打ってみよう。
+	</p>
+</Layout>
+
+<style>
+	.cell-diagram {
+		max-width: 12rem;
+		margin: 1.5rem 0;
+	}
+
+	.cell-diagram svg {
+		width: 100%;
+		height: auto;
+	}
+
+	.cell-diagram .dot.vowel {
+		fill: #dbeafe;
+		stroke: #2b6cb0;
+		stroke-width: 2;
+	}
+
+	.cell-diagram .dot.consonant {
+		fill: #fde8d2;
+		stroke: #c05621;
+		stroke-width: 2;
+	}
+
+	.cell-diagram text {
+		fill: #333;
+	}
+
+	.cell-diagram figcaption {
+		font-size: 0.9rem;
+		color: #555;
+		margin-top: 0.4rem;
+	}
+
+	.swatch {
+		display: inline-block;
+		width: 0.8em;
+		height: 0.8em;
+		border-radius: 50%;
+		vertical-align: middle;
+	}
+
+	.swatch.vowel {
+		background: #dbeafe;
+		border: 2px solid #2b6cb0;
+	}
+
+	.swatch.consonant {
+		background: #fde8d2;
+		border: 2px solid #c05621;
+	}
+</style>
