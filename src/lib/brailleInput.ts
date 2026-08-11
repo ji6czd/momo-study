@@ -1,3 +1,5 @@
+import { attachBrailleOnScreenKeyboard } from "./brailleOnScreenKeyboard";
+
 const DOT_BITS: Record<string, number> = {
   KeyF: 0x01,
   KeyD: 0x02,
@@ -22,17 +24,56 @@ const PASSTHROUGH_CODES = new Set([
 
 export interface BrailleInputOptions {
   textarea: HTMLTextAreaElement;
+  /** タブレット等、物理キーボードがない環境向けのオンスクリーンキーボードを併設するか。既定はtrue。 */
+  onScreenKeyboard?: boolean;
+}
+
+/**
+ * 指定位置にテキストを挿入し、キャレットをその直後へ動かす。
+ *
+ * `textarea.value`を直接書き換えるため、ネイティブの`input`イベントは発火しない。
+ * そこで挿入のたびに`input`イベントを手動でdispatchし、呼び出し側が1つの`input`
+ * リスナーでネイティブな編集(Backspace等)と合わせて拾えるようにしている。
+ */
+export function insertAtCaret(textarea: HTMLTextAreaElement, text: string) {
+  const pos = textarea.selectionStart ?? textarea.value.length;
+  const before = textarea.value.slice(0, pos);
+  const after = textarea.value.slice(pos);
+  textarea.value = before + text + after;
+  const newPos = pos + text.length;
+  textarea.setSelectionRange(newPos, newPos);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+/** キャレット直前の1文字(または選択範囲)を削除する。物理Backspaceキーの代わりに使う。 */
+export function deleteBeforeCaret(textarea: HTMLTextAreaElement) {
+  const start = textarea.selectionStart ?? textarea.value.length;
+  const end = textarea.selectionEnd ?? start;
+  if (start !== end) {
+    textarea.value = textarea.value.slice(0, start) + textarea.value.slice(end);
+    textarea.setSelectionRange(start, start);
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+    return;
+  }
+  if (start === 0) return;
+  textarea.value = textarea.value.slice(0, start - 1) + textarea.value.slice(start);
+  textarea.setSelectionRange(start - 1, start - 1);
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+/** dotBitsが表す1マスを、点字のUnicodeパターン(U+2800始まり)としてキャレット位置へ確定する。 */
+export function commitCell(textarea: HTMLTextAreaElement, dotBits: number) {
+  insertAtCaret(textarea, String.fromCharCode(0x2800 + dotBits));
 }
 
 /**
  * F/D/S/J/K/Lキーの同時押し(コード)で点字1セルを入力できるようにする。
  * 離されたキーが最後の1つになった瞬間に、そのセルをtextareaへ挿入して確定する。
  *
- * セル確定時は`textarea.value`を直接書き換えるため、ネイティブの`input`イベントは
- * 発火しない。そこで確定のたびに`input`イベントを手動でdispatchし、Backspace等の
- * ネイティブな編集と合わせて呼び出し側が1つの`input`リスナーで両方拾えるようにしている。
+ * 加えて、タブレットなど物理キーボードがない環境でも同じ操作感で打てるよう、
+ * 画面上の点字タイプライター風キーボードもあわせて設置する(onScreenKeyboard: falseで無効化可)。
  */
-export function attachBrailleInput({ textarea }: BrailleInputOptions) {
+export function attachBrailleInput({ textarea, onScreenKeyboard = true }: BrailleInputOptions) {
   // 押されている点字キーの数。-1 はリセット状態(次のセルの入力待ち)。
   let heldKeys = -1;
   let dotBits = 0;
@@ -69,22 +110,16 @@ export function attachBrailleInput({ textarea }: BrailleInputOptions) {
   function handleKeyUp(e: KeyboardEvent) {
     if (e.isComposing) return;
     if (heldKeys === 1) {
-      commitCell();
+      commitCell(textarea, dotBits);
+      dotBits = 0;
     }
     if (heldKeys > 0) heldKeys--;
   }
 
-  function commitCell() {
-    const cell = String.fromCharCode(0x2800 + dotBits);
-    const pos = textarea.selectionStart ?? textarea.value.length;
-    const before = textarea.value.slice(0, pos);
-    const after = textarea.value.slice(pos);
-    textarea.value = before + cell + after;
-    textarea.setSelectionRange(pos + 1, pos + 1);
-    dotBits = 0;
-    textarea.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-
   textarea.addEventListener("keydown", handleKeyDown);
   textarea.addEventListener("keyup", handleKeyUp);
+
+  if (onScreenKeyboard) {
+    attachBrailleOnScreenKeyboard(textarea);
+  }
 }

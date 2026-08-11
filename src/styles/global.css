@@ -116,3 +116,75 @@ td .braille {
 #score {
 	color: #555;
 }
+
+/* タブレット等、物理キーボードがない環境向けのオンスクリーン点字キーボード */
+.bok-wrapper {
+	margin-top: 0.75rem;
+}
+
+.bok-toggle {
+	font-size: 0.9rem;
+	padding: 0.4rem 0.8rem;
+	border: 1px solid #888;
+	border-radius: 999px;
+	background: #f5f5f5;
+	cursor: pointer;
+}
+
+.braille-onscreen-keyboard[hidden] {
+	display: none;
+}
+
+.braille-onscreen-keyboard {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 1.2rem;
+	margin-top: 0.6rem;
+	padding: 1rem;
+	background: #f0f4f8;
+	border: 1px solid #ccd7e0;
+	border-radius: 12px;
+	touch-action: none;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.bok-cell {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.5rem;
+}
+
+.bok-dot {
+	width: 3.2rem;
+	height: 3.2rem;
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: #1a3a5c;
+	background: #fff;
+	border: 2px solid #2b6cb0;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.bok-dot.active {
+	background: #2b6cb0;
+	color: #fff;
+}
+
+.bok-actions {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.bok-action {
+	min-width: 5.5rem;
+	padding: 0.6rem 0.8rem;
+	font-size: 1rem;
+	background: #fff;
+	border: 1px solid #888;
+	border-radius: 8px;
+	cursor: pointer;
+}
