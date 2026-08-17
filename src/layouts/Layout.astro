@@ -18,17 +18,18 @@ const nextPage = pageSlug ? getNextPage(pageSlug) : null;
 // @font-face の url() はCSSカスタムプロパティを解決できない(要素に紐付かないため)ので、
 // base込みのURLをビルド時に文字列として直接埋め込む。
 //
-// 点字表示に使うフォント本体はDejaVu Sans(自己ホスト、public/fonts/dejavu/)。
-// "Mono"の方は点字グリフを1つも持っていなかった(fonttoolsで確認済み)ので、通常版の
-// DejaVu Sansを使っている。プロポーショナルフォントだが、点字グリフ同士の字送り幅は
-// 統一されている(fonttoolsで確認済み: 全256グリフが1500unit)ので、点字だけを並べる
-// 用途では等幅として振る舞う。無ければ環境依存のmonospaceにフォールバックする。
+// 点字表示に使うフォント本体はSixBraille(点字専用フォント、自己ホスト、
+// public/fonts/sixbraille/)。パブリックドメイン。詳細は
+// public/fonts/sixbraille/LICENSE.txt を参照。
+// 点の形(点/白丸/小白丸/小黒丸/横線/斜線)×枠あり/なしの12バリアントの中から、
+// 横線・枠ありスタイル(hlf = sixbraille41)を採用した。他バリアントとの
+// 比較はfont-compare.astroを参照(採用フォント以外はそちら側で個別に読み込む)。
 // :root の --font-braille 定義と、それを適用するクラス/IDの一覧は styles/global.css 側。
-const brailleFontUrl = withBase("fonts/dejavu/DejaVuSans.ttf");
+const brailleFontUrl = withBase("fonts/sixbraille/sixbraille41.woff2");
 const brailleFontFaceCss = `
 	@font-face {
-		font-family: "DejaVu Sans (Braille)";
-		src: url("${brailleFontUrl}") format("truetype");
+		font-family: "SixBraille (hlf)";
+		src: url("${brailleFontUrl}") format("woff2");
 		font-display: swap;
 	}
 `;
@@ -47,7 +48,16 @@ const brailleFontFaceCss = `
 	<body>
 		<a class="skip-link" href="#main">本文へスキップ</a>
 		<header>
-			<a href={withBase("")}>{siteName}</a>
+			<a href={withBase("")} class="header-logo">
+				<img
+					src={withBase("images/momo-avatar.jpg")}
+					alt="モモ"
+					class="header-avatar"
+					width="40"
+					height="40"
+				/>
+				<span>{siteName}</span>
+			</a>
 		</header>
 		<main id="main">
 			<slot />
@@ -77,6 +87,33 @@ const brailleFontFaceCss = `
 		z-index: 100;
 		padding: 0.5em 1em;
 		background: #fff;
+	}
+
+	header {
+		padding: 0.8rem 0;
+		border-bottom: 1px solid #eee;
+	}
+
+	.header-logo {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-weight: bold;
+		font-size: 1.2rem;
+		color: #333;
+		text-decoration: none;
+	}
+
+	.header-logo:hover {
+		opacity: 0.85;
+	}
+
+	.header-avatar {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1.5px solid #ffe8cc;
 	}
 
 	/* 右下固定の「点字表を見る」ボタン(BrailleChart.astro)と、ページ末尾のコンテンツが

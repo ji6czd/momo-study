@@ -4,7 +4,7 @@
  */
 
 :root {
-	--font-braille: "DejaVu Sans (Braille)", monospace;
+	--font-braille: "SixBraille (hlf)", monospace;
 }
 
 .braille,
@@ -103,6 +103,11 @@ td .braille {
 	padding: 0.4rem 0.8rem;
 }
 
+.buttons button:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
 #feedback.correct {
 	color: #0a7a2f;
 	font-weight: bold;
@@ -115,6 +120,50 @@ td .braille {
 
 #score {
 	color: #555;
+}
+
+/* 単語当てクイズで正解数が節目(10問ごと)に達したときの、モモさんの応援バナー */
+.quiz-milestone {
+	display: flex;
+	align-items: center;
+	gap: 0.8rem;
+	margin-top: 0.8rem;
+	padding: 0.7rem 1rem;
+	background: #fff0f6;
+	border: 2px solid #fcc2d7;
+	border-radius: 16px;
+	box-shadow: 0 4px 12px rgba(194, 37, 92, 0.12);
+	animation: quiz-milestone-pop 0.4s ease;
+}
+
+.quiz-milestone[hidden] {
+	display: none;
+}
+
+.quiz-milestone-avatar {
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid #fff;
+	flex-shrink: 0;
+}
+
+.quiz-milestone-text {
+	margin: 0;
+	font-weight: bold;
+	color: #c2255c;
+}
+
+@keyframes quiz-milestone-pop {
+	from {
+		transform: scale(0.85);
+		opacity: 0;
+	}
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
 }
 
 /* タブレット等、物理キーボードがない環境向けのオンスクリーン点字キーボード */

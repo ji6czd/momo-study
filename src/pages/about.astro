@@ -1,9 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import MomoTip from "../components/MomoTip.astro";
+import { withBase } from "../lib/url";
 ---
 
 <Layout title="このサイトについて">
 	<h1>このサイトについて</h1>
+
+	<h2>案内役「モモさん」の紹介</h2>
+	<MomoTip title="やあ！ぼくがモモさんだよ" type="cheer">
+		このサイトで使っている『Momo（momors-wasm）』は、ひらがなと点字を相互に変換する賢いプログラムなんだ。<br />
+		そのMomoにちなんで、みんなと楽しく点字を学ぶためにぼく「モモさん」が案内役に就任したよ！
+	</MomoTip>
 
 	<h2>入力について</h2>
 	<ul>
@@ -33,8 +41,8 @@ import Layout from "../layouts/Layout.astro";
 				<td>かな⇄点字の変換・点訳予測</td>
 			</tr>
 			<tr>
-				<td><a href="https://dejavu-fonts.github.io/">DejaVu Sans</a></td>
-				<td><a href="https://dejavu-fonts.github.io/License.html">Bitstream Vera由来のライセンス</a></td>
+				<td><a href="http://teacher.nagano-nct.ac.jp/ito/downloads/font/">SixBraille</a></td>
+				<td>パブリックドメイン</td>
 				<td>点字のグリフを表示するフォント</td>
 			</tr>
 		</tbody>

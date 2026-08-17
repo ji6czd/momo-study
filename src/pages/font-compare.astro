@@ -1,41 +1,112 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import { withBase } from "../lib/url";
+
+// 点字フォント選定用の比較ページ。採用フォント(SixBraille hlf)はLayout.astroが
+// 全ページ向けに読み込むので、ここでは比較対象として残す旧フォント・他バリアントだけを
+// このページ限定で読み込む。
+const dejavuFontFaceCss = `
+	@font-face {
+		font-family: "DejaVu Sans (Braille) [旧]";
+		src: url("${withBase("fonts/dejavu/DejaVuSans.ttf")}") format("truetype");
+		font-display: swap;
+	}
+`;
+
+// 採用済みのhlf(横線・枠あり)を除く、SixBrailleの他バリアント。
+const SIXBRAILLE_OTHER_VARIANTS = [
+	{ code: "00", label: "p", desc: "点" },
+	{ code: "01", label: "pf", desc: "点(枠あり)" },
+	{ code: "10", label: "wd", desc: "白丸" },
+	{ code: "11", label: "wdf", desc: "白丸(枠あり)" },
+	{ code: "20", label: "swd", desc: "小白丸" },
+	{ code: "21", label: "swdf", desc: "小白丸(枠あり)" },
+	{ code: "30", label: "sbd", desc: "小黒丸" },
+	{ code: "31", label: "sbdf", desc: "小黒丸(枠あり)" },
+	{ code: "40", label: "hl", desc: "横線" },
+	{ code: "50", label: "sl", desc: "斜線" },
+	{ code: "51", label: "slf", desc: "斜線(枠あり)" },
+];
+const sixBrailleOtherFontFaceCss = SIXBRAILLE_OTHER_VARIANTS.map(
+	({ code, label }) => `
+	@font-face {
+		font-family: "SixBraille (${label})";
+		src: url("${withBase(`fonts/sixbraille/sixbraille${code}.woff2`)}") format("woff2");
+		font-display: swap;
+	}
+`,
+).join("");
 ---
 
 <Layout title="点字フォント比較(テスト用)">
+	<style is:global set:html={dejavuFontFaceCss} />
+	<style is:global set:html={sixBrailleOtherFontFaceCss} />
+
 	<h1>点字フォント比較</h1>
 	<p>
 		<kbd>F</kbd><kbd>D</kbd><kbd>S</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>キーで点字を打って、見え方を比べてみてください。
 	</p>
 
-	<div class="box">
-		<label for="input-dejavu">DejaVu Sans(点字グリフのみ等幅)</label>
-		<textarea id="input-dejavu" class="dejavu braille-textarea" rows="4" autocomplete="off" spellcheck="false"
-		></textarea>
+	<h2>採用フォント / ブラウザ既定</h2>
+	<div class="grid">
+		<div class="box">
+			<label for="input-current">SixBraille hlf — 横線(枠あり)(採用フォント)</label>
+			<textarea id="input-current" class="compare-textarea braille-textarea" style="font-family: var(--font-braille);" rows="4" autocomplete="off" spellcheck="false"
+			></textarea>
+		</div>
+
+		<div class="box">
+			<label for="input-default">ブラウザのデフォルト(フォント指定なし)</label>
+			<textarea id="input-default" class="compare-textarea braille-textarea" rows="4" autocomplete="off" spellcheck="false"
+			></textarea>
+		</div>
+
+		<div class="box">
+			<label for="input-dejavu">DejaVu Sans(点字グリフのみ等幅・旧フォント)</label>
+			<textarea id="input-dejavu" class="compare-textarea braille-textarea" style={`font-family: "DejaVu Sans (Braille) [旧]";`} rows="4" autocomplete="off" spellcheck="false"
+			></textarea>
+		</div>
 	</div>
 
-	<div class="box">
-		<label for="input-default">ブラウザのデフォルト(フォント指定なし)</label>
-		<textarea id="input-default" class="default braille-textarea" rows="4" autocomplete="off" spellcheck="false"
-		></textarea>
+	<h2>SixBraille(他バリアント)</h2>
+	<div class="grid">
+		{
+			SIXBRAILLE_OTHER_VARIANTS.map((v) => (
+				<div class="box">
+					<label for={`input-sixbraille-${v.code}`}>
+						SixBraille {v.label} — {v.desc}
+					</label>
+					<textarea
+						id={`input-sixbraille-${v.code}`}
+						class="compare-textarea braille-textarea"
+						style={`font-family: "SixBraille (${v.label})";`}
+						rows="4"
+						autocomplete="off"
+						spellcheck="false"
+					/>
+				</div>
+			))
+		}
 	</div>
 </Layout>
 
 <style>
-	.box {
-		margin: 1.5rem 0;
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+		gap: 1rem 1.5rem;
+		margin: 1rem 0 2rem;
 	}
 
-	textarea.dejavu {
-		font-family: var(--font-braille);
+	.box label {
+		font-size: 0.9rem;
 	}
-
-	/* .default は意図的にfont-familyを指定しない(他ページの変更前と同じ、UA既定のまま)。 */
 </style>
 
 <script>
 	import { attachBrailleInput } from "../lib/brailleInput";
 
-	attachBrailleInput({ textarea: document.getElementById("input-dejavu") as HTMLTextAreaElement });
-	attachBrailleInput({ textarea: document.getElementById("input-default") as HTMLTextAreaElement });
+	document.querySelectorAll<HTMLTextAreaElement>(".compare-textarea").forEach((textarea) => {
+		attachBrailleInput({ textarea });
+	});
 </script>
