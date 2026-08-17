@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import MomoTip from "../components/MomoTip.astro";
 import { DIGITS, NUMBER_SIGN, LINK_SIGN } from "../data/numbers";
 ---
 
@@ -8,6 +9,11 @@ import { DIGITS, NUMBER_SIGN, LINK_SIGN } from "../data/numbers";
 	<p>
 		点字は6つの点の組み合わせでできているから、全部で64通りしかないんだ。でも、ひらがな・かたかな・数字・アルファベット・きごう…全部あわせると64よりずっと多いよね。だから点字では、同じ形でも「今は数字だよ」と教えてくれる印を前につけて、意味を切りかえて使っているんだ。
 	</p>
+
+	<MomoTip title="数符（すうふ）のルール！">
+		数字を書くときは、必ず前に『数符（{NUMBER_SIGN}）』をつける約束になっているよ！<br />
+		数符があるおかげで、同じ点字の形でも「かな」ではなく「数字」だと分かるんだね。
+	</MomoTip>
 
 	<p>
 		数字の前につける印を<strong>数符(すうふ)</strong>というよ。数符({NUMBER_SIGN})のあとに、数字用の点字がつづくんだ。
@@ -58,7 +64,7 @@ import { DIGITS, NUMBER_SIGN, LINK_SIGN } from "../data/numbers";
 
 	<p class="buttons">
 		<button type="button" id="check-button">こたえあわせ</button>
-		<button type="button" id="next-button">つぎのもんだい</button>
+		<button type="button" id="next-button" disabled>つぎのもんだい</button>
 	</p>
 
 	<p id="feedback" aria-live="polite"></p>

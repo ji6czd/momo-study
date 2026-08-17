@@ -1,0 +1,123 @@
+---
+import { withBase } from "../lib/url";
+
+interface Props {
+	title?: string;
+	type?: "tip" | "quiz" | "cheer" | "info";
+}
+
+const { title = "モモさんのワンポイント！", type = "tip" } = Astro.props;
+---
+
+<aside class={`momo-tip momo-tip--${type}`} aria-label={title}>
+	<img
+		src={withBase("images/momo-guide.jpg")}
+		alt="案内役の犬 モモ"
+		class="momo-avatar"
+		width="80"
+		height="80"
+	/>
+	<div class="momo-bubble">
+		<div class="momo-title">
+			<span class="momo-badge">モモさん</span>
+			{title}
+		</div>
+		<div class="momo-content">
+			<slot />
+		</div>
+	</div>
+</aside>
+
+<style>
+	.momo-tip {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		margin: 1.5rem 0;
+		padding: 1rem;
+		background: #fff8f0;
+		border: 2px solid #ffd8a8;
+		border-radius: 16px;
+		box-shadow: 0 4px 12px rgba(230, 119, 0, 0.08);
+	}
+
+	.momo-tip--quiz {
+		background: #f0f7ff;
+		border-color: #a5d8ff;
+	}
+
+	.momo-tip--cheer {
+		background: #fff0f6;
+		border-color: #fcc2d7;
+	}
+
+	.momo-avatar {
+		width: 72px;
+		height: 72px;
+		border-radius: 50%;
+		object-fit: cover;
+		border: 2px solid #fff;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+		flex-shrink: 0;
+	}
+
+	.momo-bubble {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.momo-title {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-weight: bold;
+		font-size: 1.05rem;
+		color: #d9480f;
+		margin-bottom: 0.4rem;
+	}
+
+	.momo-tip--quiz .momo-title {
+		color: #1971c2;
+	}
+
+	.momo-tip--cheer .momo-title {
+		color: #c2255c;
+	}
+
+	.momo-badge {
+		background: #ffe8cc;
+		color: #d9480f;
+		font-size: 0.75rem;
+		padding: 0.15rem 0.5rem;
+		border-radius: 12px;
+		font-weight: bold;
+	}
+
+	.momo-tip--quiz .momo-badge {
+		background: #d0ebff;
+		color: #1971c2;
+	}
+
+	.momo-tip--cheer .momo-badge {
+		background: #ffdeeb;
+		color: #c2255c;
+	}
+
+	.momo-content {
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: #333;
+	}
+
+	@media (max-width: 520px) {
+		.momo-tip {
+			flex-direction: column;
+			align-items: center;
+			text-align: center;
+		}
+
+		.momo-title {
+			justify-content: center;
+		}
+	}
+</style>

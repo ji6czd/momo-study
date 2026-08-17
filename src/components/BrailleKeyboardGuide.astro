@@ -1,0 +1,412 @@
+---
+/**
+ * PCキーボード(F, D, S, J, K, L)と点字の6つの点の対応関係を視覚的に説明するイラスト・ガイドコンポーネント。
+ */
+interface Props {
+	title?: string;
+	showTips?: boolean;
+}
+
+const { title = "キーボードと点字の対応ガイド", showTips = true } = Astro.props;
+---
+
+<div class="braille-keyboard-guide" aria-label={title}>
+	<div class="guide-header">
+		<span class="guide-icon" aria-hidden="true">⌨️</span>
+		<h3>{title}</h3>
+	</div>
+
+	<p class="guide-desc">
+		キーボードの <kbd>F</kbd><kbd>D</kbd><kbd>S</kbd>（左手）と <kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>（右手）の6つのキーが、点字の6つの点に対応しています。
+	</p>
+
+	<div class="guide-content">
+		<!-- キーボード側の図解 -->
+		<div class="keyboard-section">
+			<div class="badges-row">
+				<span class="section-badge left-hand-badge">左手（1〜3の点）</span>
+				<span class="section-badge right-hand-badge">右手（4〜6の点）</span>
+			</div>
+
+			<div class="keys-container">
+				<!-- 左手キー -->
+				<div class="hand-group left-group">
+					<div class="key-card key-s">
+						<div class="finger-name">薬指</div>
+						<div class="keycap">S</div>
+						<div class="dot-target">点 ③</div>
+					</div>
+					<div class="key-card key-d">
+						<div class="finger-name">中指</div>
+						<div class="keycap">D</div>
+						<div class="dot-target">点 ②</div>
+					</div>
+					<div class="key-card key-f">
+						<div class="finger-name">人さし指</div>
+						<div class="keycap">F</div>
+						<div class="dot-target">点 ①</div>
+					</div>
+				</div>
+
+				<div class="hand-divider" aria-hidden="true"></div>
+
+				<!-- 右手キー -->
+				<div class="hand-group right-group">
+					<div class="key-card key-j">
+						<div class="finger-name">人さし指</div>
+						<div class="keycap">J</div>
+						<div class="dot-target">点 ④</div>
+					</div>
+					<div class="key-card key-k">
+						<div class="finger-name">中指</div>
+						<div class="keycap">K</div>
+						<div class="dot-target">点 ⑤</div>
+					</div>
+					<div class="key-card key-l">
+						<div class="finger-name">薬指</div>
+						<div class="keycap">L</div>
+						<div class="dot-target">点 ⑥</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- スペースキー -->
+			<div class="space-key-wrapper">
+				<div class="key-card space-card">
+					<div class="finger-name">親指（左右どちらでもOK）</div>
+					<div class="keycap space-keycap">Space（スペースキー）</div>
+					<div class="dot-target">マスあけ（1マス空ける）</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 点字マス側の図解 -->
+		<div class="braille-cell-section">
+			<div class="section-title">点字マスの配置（2列×3行）</div>
+			<div class="braille-grid">
+				<!-- 左列: 点1, 2, 3 / 右列: 点4, 5, 6 -->
+				<div class="braille-dot-card dot-1">
+					<span class="dot-number">①</span>
+					<span class="dot-key">キー F</span>
+					<span class="dot-finger">左手 人さし指</span>
+				</div>
+				<div class="braille-dot-card dot-4">
+					<span class="dot-number">④</span>
+					<span class="dot-key">キー J</span>
+					<span class="dot-finger">右手 人さし指</span>
+				</div>
+
+				<div class="braille-dot-card dot-2">
+					<span class="dot-number">②</span>
+					<span class="dot-key">キー D</span>
+					<span class="dot-finger">左手 中指</span>
+				</div>
+				<div class="braille-dot-card dot-5">
+					<span class="dot-number">⑤</span>
+					<span class="dot-key">キー K</span>
+					<span class="dot-finger">右手 中指</span>
+				</div>
+
+				<div class="braille-dot-card dot-3">
+					<span class="dot-number">③</span>
+					<span class="dot-key">キー S</span>
+					<span class="dot-finger">左手 薬指</span>
+				</div>
+				<div class="braille-dot-card dot-6">
+					<span class="dot-number">⑥</span>
+					<span class="dot-key">キー L</span>
+					<span class="dot-finger">右手 薬指</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{
+		showTips && (
+			<div class="guide-footer-tip">
+				💡 <strong>打ち方のコツ：</strong> 出したい点字の点のキーを<strong>同時に押して、いっしょに離す</strong>と1文字（1マス）入力できます。
+			</div>
+		)
+	}
+</div>
+
+<style>
+	.braille-keyboard-guide {
+		margin: 1.5rem 0;
+		padding: 1.25rem 1.5rem;
+		background: #fafafc;
+		border: 2px solid #e2e8f0;
+		border-radius: 16px;
+		box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+	}
+
+	.guide-header {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 0.4rem;
+	}
+
+	.guide-icon {
+		font-size: 1.4rem;
+	}
+
+	.guide-header h3 {
+		margin: 0;
+		font-size: 1.15rem;
+		color: #2d3748;
+	}
+
+	.guide-desc {
+		margin: 0 0 1.25rem 0;
+		font-size: 0.95rem;
+		color: #4a5568;
+		line-height: 1.6;
+	}
+
+	.guide-content {
+		display: grid;
+		grid-template-columns: 1fr 280px;
+		gap: 1.5rem;
+		align-items: start;
+	}
+
+	/* キーボードエリア */
+	.keyboard-section {
+		background: #ffffff;
+		padding: 1rem 1.25rem;
+		border-radius: 12px;
+		border: 1px solid #edf2f7;
+	}
+
+	.badges-row {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: 0.6rem;
+	}
+
+	.section-badge {
+		display: inline-block;
+		font-size: 0.8rem;
+		font-weight: bold;
+		padding: 0.2rem 0.6rem;
+		border-radius: 6px;
+	}
+
+	.left-hand-badge {
+		background: #fff4e6;
+		color: #d9480f;
+		border: 1px solid #ffe8cc;
+	}
+
+	.right-hand-badge {
+		background: #e7f5ff;
+		color: #1971c2;
+		border: 1px solid #d0ebff;
+	}
+
+	.keys-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		gap: 0.75rem;
+		margin-top: 0.5rem;
+	}
+
+	.hand-group {
+		display: flex;
+		gap: 0.4rem;
+	}
+
+	.hand-divider {
+		width: 2px;
+		height: 48px;
+		background: #e2e8f0;
+		border-radius: 1px;
+	}
+
+	.key-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+	}
+
+	.finger-name {
+		font-size: 0.75rem;
+		color: #718096;
+		margin-bottom: 0.25rem;
+		white-space: nowrap;
+	}
+
+	.keycap {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		font-size: 1.2rem;
+		font-weight: bold;
+		border-radius: 8px;
+		box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+		transition: transform 0.1s ease;
+	}
+
+	.left-group .keycap {
+		background: #fff0f6;
+		color: #d9480f;
+		border: 2px solid #ffc9c9;
+	}
+
+	.right-group .keycap {
+		background: #edf2ff;
+		color: #1971c2;
+		border: 2px solid #bac8ff;
+	}
+
+	.dot-target {
+		font-size: 0.8rem;
+		font-weight: bold;
+		margin-top: 0.3rem;
+		white-space: nowrap;
+	}
+
+	.left-group .dot-target {
+		color: #e8590c;
+	}
+
+	.right-group .dot-target {
+		color: #3b5bdb;
+	}
+
+	/* スペースキー */
+	.space-key-wrapper {
+		margin-top: 1rem;
+		padding-top: 0.75rem;
+		border-top: 1px dashed #e2e8f0;
+		display: flex;
+		justify-content: center;
+	}
+
+	.space-card .keycap {
+		width: 220px;
+		height: 34px;
+		font-size: 0.9rem;
+		background: #ebfbee;
+		color: #2b8a3e;
+		border: 2px solid #b2f2bb;
+	}
+
+	.space-card .dot-target {
+		color: #2b8a3e;
+	}
+
+	/* 点字マスエリア */
+	.braille-cell-section {
+		background: #ffffff;
+		padding: 1rem;
+		border-radius: 12px;
+		border: 1px solid #edf2f7;
+	}
+
+	.section-title {
+		font-size: 0.85rem;
+		font-weight: bold;
+		color: #4a5568;
+		text-align: center;
+		margin-bottom: 0.75rem;
+	}
+
+	.braille-grid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.5rem;
+	}
+
+	.braille-dot-card {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		padding: 0.5rem 0.4rem;
+		border-radius: 8px;
+		border: 1.5px solid #cbd5e0;
+		background: #f7fafc;
+		text-align: center;
+	}
+
+	.dot-1,
+	.dot-2,
+	.dot-3 {
+		border-color: #ffd8a8;
+		background: #fff9db;
+	}
+
+	.dot-4,
+	.dot-5,
+	.dot-6 {
+		border-color: #a5d8ff;
+		background: #e7f5ff;
+	}
+
+	.dot-number {
+		font-size: 1.1rem;
+		font-weight: bold;
+		line-height: 1;
+	}
+
+	.dot-1 .dot-number,
+	.dot-2 .dot-number,
+	.dot-3 .dot-number {
+		color: #e8590c;
+	}
+
+	.dot-4 .dot-number,
+	.dot-5 .dot-number,
+	.dot-6 .dot-number {
+		color: #1971c2;
+	}
+
+	.dot-key {
+		font-size: 0.85rem;
+		font-weight: bold;
+		margin-top: 0.15rem;
+		color: #2d3748;
+	}
+
+	.dot-finger {
+		font-size: 0.7rem;
+		color: #718096;
+		margin-top: 0.1rem;
+	}
+
+	.guide-footer-tip {
+		margin-top: 1rem;
+		padding: 0.6rem 0.9rem;
+		background: #fff9db;
+		border: 1px solid #ffe066;
+		border-radius: 8px;
+		font-size: 0.88rem;
+		color: #5c940d;
+	}
+
+	/* レスポンシブ調整 */
+	@media (max-width: 680px) {
+		.guide-content {
+			grid-template-columns: 1fr;
+		}
+
+		.keys-container {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+
+		.hand-divider {
+			display: none;
+		}
+
+		.space-card .keycap {
+			width: 100%;
+			max-width: 220px;
+		}
+	}
+</style>

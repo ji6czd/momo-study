@@ -4,9 +4,27 @@ import { withBase } from "../lib/url";
 ---
 
 <Layout>
-	<h1>モモさんと点字を学ぼう！</h1>
-	<p>点字について、いっしょに学んでいこう。</p>
-	<ul>
+	<section class="hero">
+		<div class="hero-text">
+			<h1>モモさんと点字を学ぼう！</h1>
+			<div class="hero-actions">
+				<a href={withBase("what-is-braille")} class="hero-btn primary">はじめの一歩：点字って何？ →</a>
+				<a href={withBase("write-freely")} class="hero-btn secondary">自由に点字を書いてみる</a>
+			</div>
+		</div>
+		<div class="hero-image-wrap">
+			<img
+				src={withBase("images/momo-hero.jpg")}
+				alt="点字の教科書を持った犬のモモさん"
+				class="hero-image"
+				width="240"
+				height="240"
+			/>
+		</div>
+	</section>
+
+	<h2>もくじ</h2>
+	<ul class="lesson-list">
 		<li><a href={withBase("what-is-braille")}>点字って何？</a></li>
 		<li><a href={withBase("write-freely")}>自由に書いてみよう</a></li>
 		<li><a href={withBase("history")}>点字はいつできたの？</a></li>
@@ -24,3 +42,100 @@ import { withBase } from "../lib/url";
 		<li><a href={withBase("find-braille")}>点字を探してみよう</a></li>
 	</ul>
 </Layout>
+
+<style>
+	.hero {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1.5rem;
+		background: linear-gradient(135deg, #fff9f2 0%, #ffe3c9 100%);
+		border: 2px solid #ffd8a8;
+		padding: 1.8rem 2rem;
+		border-radius: 20px;
+		margin-bottom: 2rem;
+		box-shadow: 0 6px 16px rgba(217, 72, 15, 0.08);
+	}
+
+	.hero-text {
+		flex: 1;
+	}
+
+	.hero-text h1 {
+		margin-top: 0;
+		margin-bottom: 0.8rem;
+		font-size: 1.7rem;
+		color: #d9480f;
+	}
+
+	.hero-lead {
+		font-size: 1.05rem;
+		line-height: 1.6;
+		margin-bottom: 1.2rem;
+		color: #444;
+	}
+
+	.hero-actions {
+		display: flex;
+		gap: 0.8rem;
+		flex-wrap: wrap;
+	}
+
+	.hero-btn {
+		display: inline-block;
+		padding: 0.6rem 1.1rem;
+		border-radius: 24px;
+		font-weight: bold;
+		text-decoration: none;
+		font-size: 0.95rem;
+		transition: transform 0.15s ease;
+	}
+
+	.hero-btn:hover {
+		transform: translateY(-2px);
+	}
+
+	.hero-btn.primary {
+		background: #e8590c;
+		color: #fff;
+	}
+
+	.hero-btn.secondary {
+		background: #fff;
+		color: #e8590c;
+		border: 1.5px solid #e8590c;
+	}
+
+	.hero-image-wrap {
+		flex-shrink: 0;
+	}
+
+	.hero-image {
+		width: 180px;
+		height: 180px;
+		border-radius: 20px;
+		object-fit: cover;
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	}
+
+	.lesson-list {
+		line-height: 1.9;
+	}
+
+	@media (max-width: 640px) {
+		.hero {
+			flex-direction: column-reverse;
+			text-align: center;
+			padding: 1.2rem;
+		}
+
+		.hero-actions {
+			justify-content: center;
+		}
+
+		.hero-image {
+			width: 140px;
+			height: 140px;
+		}
+	}
+</style>

@@ -1,17 +1,15 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import BrailleKeyboardGuide from "../components/BrailleKeyboardGuide.astro";
 ---
 
 <Layout title="自由に書いてみよう" pageSlug="write-freely">
 	<h1>自由に書いてみよう</h1>
 	<p>
-		<kbd>F</kbd><kbd>D</kbd><kbd>S</kbd><kbd>J</kbd><kbd>K</kbd><kbd>L</kbd>
-		の6つのキーで、点字を打ってみよう。
+		キーボードのキーを使って点字を打つ体験ができます。下の図を参考にしながら、点字を打ってみよう！
 	</p>
-	<p>
-		左手の指を <kbd>F</kbd><kbd>D</kbd><kbd>S</kbd>、右手の指を
-		<kbd>J</kbd><kbd>K</kbd><kbd>L</kbd> に置いて、点のある場所のキーをいっしょに押して、はなしてみてね。
-	</p>
+
+	<BrailleKeyboardGuide />
 
 	<div class="practice">
 		<label for="braille-input">打った点字</label>

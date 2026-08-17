@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import MomoTip from "../components/MomoTip.astro";
 ---
 
 <Layout title="点字って何？" pageSlug="what-is-braille">
@@ -10,10 +11,13 @@ import Layout from "../layouts/Layout.astro";
 	<p>
 		目の見えない人や、見えにくい人が、指先で点をなぞりながら読んだり、専用の道具で点を打って書いたりするよ。
 	</p>
-	<p>
-		6つの点の組み合わせで、ひらがなや数字、アルファベットなどを表すことができるんだ。
-	</p>
-	<p>縦ニ三つ、横ニ二つの点を使って、文字を作るんだよ。</p>
+
+	<MomoTip title="6つの点の不思議！">
+		点字は「縦3つ × 横2列」の合計6つの点だけでできているんだ！<br />
+		点の出す・出さないの組み合わせで、全部で64通りの形が作れるよ。
+	</MomoTip>
+
+	<p>縦に三つ、横に二つの点を使って、文字を作るんだよ。</p>
 
 	<figure class="cell-diagram">
 		<svg viewBox="0 0 160 220" role="img" aria-labelledby="cell-diagram-title" xmlns="http://www.w3.org/2000/svg">
