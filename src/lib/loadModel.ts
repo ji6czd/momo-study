@@ -30,8 +30,14 @@ export async function loadModel(options: LoadModelOptions = {}): Promise<Uint8Ar
 		options.onProgress?.(loadedBytes, totalBytes);
 	}
 
-	const compressedStream = new Blob(chunks).stream();
-	const decompressedStream = compressedStream.pipeThrough(new DecompressionStream("gzip"));
+	const blob = new Blob(chunks);
+	// 開発サーバーなどが`Content-Encoding: gzip`を付けて返すと、ブラウザが先に展開してしまう。
+	// gzipのマジックナンバー(1f 8b)が残っているときだけ自分で展開する。
+	const head = new Uint8Array(await blob.slice(0, 2).arrayBuffer());
+	if (head[0] !== 0x1f || head[1] !== 0x8b) {
+		return new Uint8Array(await blob.arrayBuffer());
+	}
+	const decompressedStream = blob.stream().pipeThrough(new DecompressionStream("gzip"));
 	const decompressedBlob = await new Response(decompressedStream).blob();
 	return new Uint8Array(await decompressedBlob.arrayBuffer());
 }

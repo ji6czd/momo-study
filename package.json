@@ -14,7 +14,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.1.6",
+    "astro": "^7.4.2",
     "momors-wasm": "file:vendor/pkg"
   }
 }

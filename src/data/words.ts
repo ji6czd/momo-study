@@ -80,7 +80,11 @@ export const CHARACTER_WORDS: KanjiWord[] = [
  * brailleは区切りの点字スペース(⠀)を含む、実際の正解。
  */
 export const WAKACHI_WORDS: KanjiWord[] = [
-  { source: "小学校5年生", kana: "しょうがっこう　ごねんせい", braille: "⠈⠺⠒⠐⠡⠂⠪⠒⠀⠼⠑⠏⠴⠻⠃" },
+  {
+    source: "小学校5年生",
+    kana: "しょうがっこう　ごねんせい",
+    braille: "⠈⠺⠒⠐⠡⠂⠪⠒⠀⠼⠑⠏⠴⠻⠃",
+  },
   { source: "音楽鑑賞", kana: "おんがく　かんしょう", braille: "⠊⠴⠐⠡⠩⠀⠡⠴⠈⠺⠒" },
   { source: "漢字テスト", kana: "かんじ　テスト", braille: "⠡⠴⠐⠳⠀⠟⠹⠞" },
   { source: "私は花", kana: "わたしわ　はな", braille: "⠄⠕⠳⠄⠀⠥⠅" },
@@ -106,8 +110,8 @@ export const SENTENCE_WORDS: KanjiWord[] = [
   },
   {
     source: "夏休みはだいたい6週間です。",
-    kana: "なつやすみわだいたい　6しゅうかんです。",
-    braille: "⠅⠝⠌⠹⠷⠄⠐⠕⠃⠕⠃⠀⠼⠋⠈⠹⠒⠡⠴⠐⠟⠹⠲",
+    kana: "なつやすみ　わだいたい　6しゅうかんです。",
+    braille: "⠅⠝⠌⠹⠷⠄⠀⠐⠕⠃⠕⠃⠀⠼⠋⠈⠹⠒⠡⠴⠐⠟⠹⠲",
   },
   {
     source: "最近ネットのゲームが人気です。",
